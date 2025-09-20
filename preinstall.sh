@@ -133,3 +133,33 @@ while [ true ]; do
         break
     fi
 done
+
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Selecting the mirrors
+-------------------------------------------------------------------------
+"
+
+reflector —verbose --latest 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Installing essential packages
+-------------------------------------------------------------------------
+"
+
+pacstrap -K /mnt base base-devel linux linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git --noconfirm --needed
+
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Configuring the system
+-------------------------------------------------------------------------
+"
+
+genfstab -U /mnt >> /mnt/etc/fstab
+
+# Fix EFI partition mount options
+sed -i '/\/efi/ s/fmask=[0-9]\{4\}/fmask=0137/; s/dmask=[0-9]\{4\}/dmask=0027/' /mnt/etc/fstab
