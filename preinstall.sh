@@ -89,8 +89,8 @@ ROOT_SIZE=$(((DISK_SIZE - SWAP_SIZE) * 40 / 100))
 echo "Swap size: ${SWAP_SIZE}"
 echo "Root size: ${ROOT_SIZE}"
 
-cryptsetup luksFormat ${DISK}
-cryptsetup open ${DISK} cryptlvm
+cryptsetup luksFormat ${DISK}2
+cryptsetup open ${DISK}2 cryptlvm
 pvcreate /dev/mapper/cryptlvm
 vgcreate archvolume /dev/mapper/cryptlvm
 lvcreate -L ${SWAP_SIZE}G -n swap archvolume
@@ -111,7 +111,7 @@ lvreduce -L -256M --resizefs archvolume/home
 mount /dev/mapper/archvolume-root /mnt
 mkdir /mnt/home
 mount /dev/mapper/archvolume-home /mnt/home
-swapon /dev/mapper/archvolume-root
+swapon /dev/mapper/archvolume-swap
 mkfs.fat -F32 ${DISK}1 # kijken hoe te doen
 mkdir /mnt/efi
 mount ${DISK}1 /mnt/efi
