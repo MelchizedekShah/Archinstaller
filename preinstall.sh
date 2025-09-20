@@ -89,8 +89,8 @@ ROOT_SIZE=$(((DISK_SIZE - SWAP_SIZE) * 40 / 100))
 echo "Swap size: ${SWAP_SIZE}"
 echo "Root size: ${ROOT_SIZE}"
 
-cryptsetup luksFormat /dev/${DISK}
-cryptsetup open /dev/${DISK} cryptlvm
+cryptsetup luksFormat ${DISK}
+cryptsetup open ${DISK} cryptlvm
 pvcreate /dev/mapper/cryptlvm
 vgcreate archvolume /dev/mapper/cryptlvm
 lvcreate -L ${SWAP_SIZE}G -n swap archvolume
