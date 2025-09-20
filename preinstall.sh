@@ -97,4 +97,30 @@ lvcreate -L ${SWAP_SIZE}G -n swap archvolume
 lvcreate -L ${ROOT_SIZE}G -n root archvolume
 lvcreate -l 100%FREE -n home archvolume
 
-lsblk
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Creating filesystems
+-------------------------------------------------------------------------
+"
+
+mkfs.ext4 /dev/mapper/archvolume-root
+mkfs.ext4 /dev/mapper/archvolume-home
+mkswap /dev/mapper/archvolume-swap
+lvreduce -L -256M --resizefs archvolume/home
+mount /dev/mapper/archvolume-root /mnt
+mkdir /mnt/home
+mount /dev/mapper/archvolume-home /mnt/home
+swapon /dev/mapper/archvolume-root
+mkfs.fat -F32 ${DISK}1 # kijken hoe te doen
+mkdir /mnt/efi
+mount ${DISK}1 /mnt/efi
+
+
+while [ true ]; do
+    lsblk
+    read -p "Continue (y): " anwser
+    if [[ $anwser == "y" || $anwser == "Y" ]]; then
+        break
+    fi
+done
