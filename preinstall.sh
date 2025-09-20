@@ -89,8 +89,17 @@ ROOT_SIZE=$(((DISK_SIZE - SWAP_SIZE) * 40 / 100))
 echo "Swap size: ${SWAP_SIZE}"
 echo "Root size: ${ROOT_SIZE}"
 
-cryptsetup luksFormat ${DISK}2
-cryptsetup open ${DISK}2 cryptlvm
+if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
+    partition1=${DISK}p1
+    partition2=${DISK}p2
+else
+    partition1=${DISK}1
+    partition2=${DISK}2
+fi
+
+
+cryptsetup luksFormat ${partition2}
+cryptsetup open ${partition2} cryptlvm
 pvcreate /dev/mapper/cryptlvm
 vgcreate archvolume /dev/mapper/cryptlvm
 lvcreate -L ${SWAP_SIZE}G -n swap archvolume
@@ -112,9 +121,9 @@ mount /dev/mapper/archvolume-root /mnt
 mkdir /mnt/home
 mount /dev/mapper/archvolume-home /mnt/home
 swapon /dev/mapper/archvolume-swap
-mkfs.fat -F32 ${DISK}1 # kijken hoe te doen
+mkfs.fat -F32 ${partition1}
 mkdir /mnt/efi
-mount ${DISK}1 /mnt/efi
+mount ${partition1} /mnt/efi
 
 
 while [ true ]; do
