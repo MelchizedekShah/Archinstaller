@@ -141,7 +141,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-reflector —verbose --latest 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 
 
 echo -ne "
