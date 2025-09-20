@@ -78,4 +78,23 @@ sgdisk -a 2048 -o ${DISK}
 sgdisk -n 1::+3G --typecode=1:ef00 --change-name=1:'EFIBOOT' ${DISK}
 sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
 partprobe ${DISK}
+
+
+# Calculating sizes for lvm
+RAM_GB=$(free -m | awk '/^Mem:/ {printf "%.0f", $2/1024}')
+DISK_SIZE_RAW=$(lsblk -d -n -o SIZE $DISK)
+DISK_SIZE=$(echo $DISK_SIZE_RAW | sed 's/G//' | awk '{printf "%.0f", $1}')
+SWAP_SIZE=$((RAM_GB * 2))
+ROOT_SIZE=$(((DISK_SIZE - SWAP_SIZE) * 40 / 100))
+echo "Swap size: ${SWAP_SIZE}"
+echo "Root size: ${ROOT_SIZE}"
+
+cryptsetup luksFormat /dev/${DISK}
+cryptsetup open /dev/${DISK} cryptlvm
+pvcreate /dev/mapper/cryptlvm
+vgcreate archvolume /dev/mapper/cryptlvm
+lvcreate -L ${SWAP_SIZE}G -n swap archvolume
+lvcreate -L ${ROOT_SIZE}G -n root archvolume
+lvcreate -l 100%FREE -n home archvolume
+
 lsblk
