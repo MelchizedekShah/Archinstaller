@@ -24,6 +24,11 @@ if [[ -f /sys/firmware/efi/fw_platform_size ]]; then
         echo "Not supported exiting..."
         exit
     fi
+else
+    # BIOS system detected
+    echo "Error: BIOS/Legacy boot detected"
+    echo "This installer requires 64-bit EFI firmware"
+    exit
 fi
 
 echo -ne "
