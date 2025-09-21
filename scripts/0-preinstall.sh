@@ -97,7 +97,9 @@ else
     partition2=${DISK}2
 fi
 
-echo "partition2=$partition2" > /mnt/usr/local/share/Archinstaller/vars.sh
+
+LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+echo "LUKS_UUID=$LUKS_UUID" > /mnt/usr/local/share/Archinstaller/vars.sh
 
 cryptsetup luksFormat ${partition2}  # dit in een loop zetten zodat het beter tegen failure kan
 cryptsetup open ${partition2} cryptlvm

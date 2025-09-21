@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source /usr/local/share/Archinstaller/vars.sh
+#source /usr/local/share/Archinstaller/vars.sh
+source /mnt/usr/local/share/Archinstaller/vars.sh
 
 
 echo -ne "
@@ -70,8 +71,8 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-LUKS_UUID=$(blkid -s UUID -o value $partition2)
-echo "rd.luks.name=$LUKS_UUID=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
+echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
+
 
 
 echo -ne "

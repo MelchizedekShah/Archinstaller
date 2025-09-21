@@ -6,7 +6,6 @@
 set -a
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
-CONFIGS_DIR="$SCRIPT_DIR/configs"
 set +a
 chmod +x ${SCRIPTS_DIR}/*
 
