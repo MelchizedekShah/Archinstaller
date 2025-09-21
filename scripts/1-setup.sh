@@ -69,7 +69,7 @@ echo -ne "
 source /usr/local/share/Archinstaller/configs/setup.conf
 
 LUKS_UUID=$(blkid -s UUID -o value "$partition2")
-echo "rd.luks.name=$LUKS_UUID=cryptlvm root=/dev/archvolume/root rw" > /mnt/etc/kernel/cmdline
+echo "rd.luks.name=$LUKS_UUID=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
 
 
 echo -ne "
@@ -105,6 +105,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
+bootctl install
 cat > /efi/loader/loader.conf <<'EOF'
 default arch-linux.efi
 timeout 5
