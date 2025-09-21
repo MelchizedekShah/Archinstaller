@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./0-preinstall.sh
+source /usr/local/share/Archinstaller/vars.sh
+
 
 echo -ne "
 -------------------------------------------------------------------------
