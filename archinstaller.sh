@@ -9,6 +9,14 @@ SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 CONFIGS_DIR="$SCRIPT_DIR/configs"
 set +a
 
+cp -r $SCRIPT_DIR/* /mnt/usr/local/share/Archinstaller/
+chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
+
+CONFIG_FILE=$CONFIGS_DIR/setup.conf
+if [ ! -f $CONFIG_FILE ]; then # check if file exists
+    touch -f $CONFIG_FILE # create file if not exists
+fi
+
 clear
 
 echo -ne "

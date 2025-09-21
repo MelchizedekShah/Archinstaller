@@ -152,7 +152,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-pacstrap -K /mnt base base-devel linux linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git --noconfirm --needed
+pacstrap -K /mnt base base-devel linux linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git --noconfirm --needed --verbose
 
 
 echo -ne "
