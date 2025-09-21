@@ -17,7 +17,7 @@ while true
 		echo "Incorrect username."
 	done
 
-useradd –m –G wheel –s /bin/bash ${username}
+useradd -m -G wheel -s /bin/bash ${username}
 passwd ${username}
 
 
