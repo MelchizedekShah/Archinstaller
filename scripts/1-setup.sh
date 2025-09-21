@@ -58,7 +58,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)/' /mnt/etc/mkinitcpio.conf
+sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 
 
 echo -ne "
