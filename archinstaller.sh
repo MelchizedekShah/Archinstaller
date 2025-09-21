@@ -1,1 +1,30 @@
 #!/bin/bash
+
+
+# Find the name of the folder the scripts are in
+
+set -a
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+SCRIPTS_DIR="$SCRIPT_DIR/scripts"
+CONFIGS_DIR="$SCRIPT_DIR/configs"
+set +a
+
+clear
+
+echo -ne "
+-------------------------------------------------------------------------
+    _             _     _           _        _ _
+   / \   _ __ ___| |__ (_)_ __  ___| |_ __ _| | | ___ _ __
+  / _ \ | '__/ __| '_ \| | '_ \/ __| __/ _  | | |/ _ \ '__|
+ / ___ \| | | (__| | | | | | | \__ \ || (_| | | |  __/ |
+/_/   \_\_|  \___|_| |_|_|_| |_|___/\__\__,_|_|_|\___|_|
+-------------------------------------------------------------------------
+                    Automated Arch Linux Installer
+-------------------------------------------------------------------------
+"
+
+sleep 1
+
+
+( bash $SCRIPTS_DIR/0-preinstall.sh )|& tee 0-preinstall.log
+( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/1-setup.sh )|& tee 1-setup.log
