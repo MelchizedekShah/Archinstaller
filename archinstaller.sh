@@ -37,5 +37,13 @@ chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/2-setup.sh )|& tee 2-setup.log
 
-# moet nog afmaken
+# unmount all the mount points
 umount -R /mnt
+
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Installation finished!
+-------------------------------------------------------------------------
+"
+echo "Please reboot you Installation"
