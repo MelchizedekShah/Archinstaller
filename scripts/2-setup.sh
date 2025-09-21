@@ -19,6 +19,7 @@ while true
 
 useradd -m -G wheel -s /bin/bash ${username}
 passwd ${username}
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
 
 echo -ne "
@@ -29,15 +30,6 @@ echo -ne "
 sed -i 's/^#Color/Color/' /etc/pacman.conf
 sed -i '/^Color$/a ILoveCandy' /etc/pacman.conf
 
-echo -ne "
--------------------------------------------------------------------------
-                        pacman configuration
--------------------------------------------------------------------------
-"
-git clone https://aur.archlinux.org/paru.git
-cd paru
-makepkg -si
-cd ..
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -129,12 +121,10 @@ if [[ $de_choice != 3 ]]; then
         "
 
     git clone https://github.com/AdnanHodzic/auto-cpufreq.git
-    cd auto-cpufreq && sudo ./auto-cpufreq-installer
+    cd auto-cpufreq && ./auto-cpufreq-installer
     cd ..
 fi
 
-
-echo -ne "
 -------------------------------------------------------------------------
                             Networking
 -------------------------------------------------------------------------
