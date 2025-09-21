@@ -69,7 +69,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+LUKS_UUID=$(blkid -s UUID -o value $partition2)
 echo "rd.luks.name=$LUKS_UUID=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
 
 

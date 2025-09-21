@@ -90,15 +90,15 @@ echo "Swap size: ${SWAP_SIZE}"
 echo "Root size: ${ROOT_SIZE}"
 
 if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
-    export partition1=${DISK}p1
-    export partition2=${DISK}p2
+    partition1=${DISK}p1
+    partition2=${DISK}p2
 else
-    export partition1=${DISK}1
-    export partition2=${DISK}2
+    partition1=${DISK}1
+    partition2=${DISK}2
 fi
 
 
-cryptsetup luksFormat ${partition2}
+cryptsetup luksFormat ${partition2}  # dit in een loop zetten zodat het beter tegen failure kan
 cryptsetup open ${partition2} cryptlvm
 pvcreate /dev/mapper/cryptlvm
 vgcreate archvolume /dev/mapper/cryptlvm
