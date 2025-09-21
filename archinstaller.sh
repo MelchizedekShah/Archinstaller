@@ -34,6 +34,10 @@ sleep 1
 
 
 ( bash $SCRIPTS_DIR/0-preinstall.sh )|& tee 0-preinstall.log
-cp -r $SCRIPT_DIR/* /mnt/usr/local/share/Archinstaller/
+
+mkdir -p /mnt/usr/local/share/Archinstaller
+cp -r "$SCRIPT_DIR"/* /mnt/usr/local/share/Archinstaller/
 chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
+
+
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/1-setup.sh )|& tee 1-setup.log
