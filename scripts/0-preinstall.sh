@@ -90,11 +90,11 @@ echo "Swap size: ${SWAP_SIZE}"
 echo "Root size: ${ROOT_SIZE}"
 
 if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
-    partition1=${DISK}p1
-    partition2=${DISK}p2
+    export partition1=${DISK}p1
+    export partition2=${DISK}p2
 else
-    partition1=${DISK}1
-    partition2=${DISK}2
+    export partition1=${DISK}1
+    export partition2=${DISK}2
 fi
 
 

@@ -39,7 +39,7 @@ locale-gen
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 
 # installing tty font package
-pacman -S terminus-font
+pacman -S terminus-font --noconfirm --needed
 echo "KEYMAP=us" >> /etc/vconsole.conf && echo "FONT=ter-132b" >> /etc/vconsole.conf
 
 
@@ -68,7 +68,6 @@ echo -ne "
                     Configure the kernel cmdline
 -------------------------------------------------------------------------
 "
-source /usr/local/share/Archinstaller/configs/setup.conf
 
 LUKS_UUID=$(blkid -s UUID -o value "$partition2")
 echo "rd.luks.name=$LUKS_UUID=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
