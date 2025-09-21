@@ -98,10 +98,6 @@ else
 fi
 
 
-LUKS_UUID=$(blkid -s UUID -o value "$partition2")
-mkdir - p /mnt/usr/local/share/Archinstaller && touch /mnt/usr/local/share/Archinstaller/vars.sh
-echo "LUKS_UUID=$LUKS_UUID" > /mnt/usr/local/share/Archinstaller/vars.sh
-
 cryptsetup luksFormat ${partition2}  # dit in een loop zetten zodat het beter tegen failure kan
 cryptsetup open ${partition2} cryptlvm
 pvcreate /dev/mapper/cryptlvm
@@ -138,6 +134,9 @@ while [ true ]; do
     fi
 done
 
+LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+mkdir -p /mnt/usr/local/share/Archinstaller && touch /mnt/usr/local/share/Archinstaller/vars.sh
+echo "LUKS_UUID=$LUKS_UUID" > /mnt/usr/local/share/Archinstaller/vars.sh
 
 echo -ne "
 -------------------------------------------------------------------------
