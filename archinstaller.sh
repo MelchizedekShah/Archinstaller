@@ -9,8 +9,7 @@ SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 CONFIGS_DIR="$SCRIPT_DIR/configs"
 set +a
 
-cp -r $SCRIPT_DIR/* /mnt/usr/local/share/Archinstaller/
-chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
+
 
 CONFIG_FILE=$CONFIGS_DIR/setup.conf
 if [ ! -f $CONFIG_FILE ]; then # check if file exists
@@ -35,4 +34,6 @@ sleep 1
 
 
 ( bash $SCRIPTS_DIR/0-preinstall.sh )|& tee 0-preinstall.log
+cp -r $SCRIPT_DIR/* /mnt/usr/local/share/Archinstaller/
+chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/1-setup.sh )|& tee 1-setup.log
