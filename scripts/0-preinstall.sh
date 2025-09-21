@@ -97,8 +97,6 @@ else
     partition2=${DISK}2
 fi
 
-echo "partition1=$partition1" >> "$CONFIGS_DIR/setup.conf"
-echo "partition2=$partition2" >> "$CONFIGS_DIR/setup.conf"
 
 cryptsetup luksFormat ${partition2}
 cryptsetup open ${partition2} cryptlvm
