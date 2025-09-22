@@ -235,7 +235,16 @@ while true; do
 done
 
 #Set Password
-read -p "Please enter password:" password
+while true; do
+    read -s -p "Please enter password: " password
+    read -s -p "Confirm password: " password_confirm
+    if [[ "$password" == "$password_confirm" ]]; then
+        echo "Password setup success"
+        break
+    else
+        echo "Passwords do not match. Try again."
+    fi
+done
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -284,6 +293,7 @@ case $de_choice in
     4)
         echo "Minimal setup"
         de_choice=MIN
+        ;;
     *)
         echo "Invalid choice. Installing Minimal setup"
         de_choice=MIN
@@ -351,19 +361,33 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-reflector --verbose --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
-
+echo "Updating mirrors with reflector..."
+    if ! reflector --verbose --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist; then
+        echo "Warning: Reflector failed, using existing mirrors"
+        echo "You may want to manually update /etc/pacman.d/mirrorlist later"
+    fi
 
 echo -ne "
 -------------------------------------------------------------------------
                     Installing essential packages
 -------------------------------------------------------------------------
 "
+
 if [[ $de_choice != SERVER ]]; then
-    pacstrap -K /mnt base base-devel bash linux linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git --noconfirm --needed
+    packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git"
 else
-    pacstrap -K /mnt base bash linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git --noconfirm --needed
+    packages="base bash linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git"
 fi
+
+while true; do
+    if ! pacstrap -K /mnt ${packages} --noconfirm --needed; then
+        echo "ERROR: Package installation failed"
+        echo "Try again.."
+    else
+        echo "Succes"
+        break
+    fi
+done
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -373,8 +397,11 @@ echo -ne "
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
-# Fix EFI partition mount options
-sed -i '/\/efi/ s/fmask=[0-9]\{4\}/fmask=0137/; s/dmask=[0-9]\{4\}/dmask=0027/' /mnt/etc/fstab
-
+if [[ $platform == "EFI" ]]; then
+    echo "Fixing EFI mount options in fstab..."
+    sed -i '/\/efi/ s/fmask=[0-9]\{4\}/fmask=0137/; s/dmask=[0-9]\{4\}/dmask=0027/' /mnt/etc/fstab
+else
+    echo "Check bios fstab... still in development"
+fi
 
 # Finished 0-preinstall.sh
