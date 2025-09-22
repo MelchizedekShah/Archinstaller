@@ -2,6 +2,8 @@
 
 source /usr/local/share/Archinstaller/vars.sh
 
+clear
+
 echo -ne "
 -------------------------------------------------------------------------
     _             _     _           _        _ _
@@ -17,7 +19,15 @@ echo -ne "
                         Password setup
 -------------------------------------------------------------------------
 "
-passwd
+
+if [[ $(whoami) = "root" ]]; then
+    # use chpasswd to enter $USERNAME:$password
+    echo "$(whoami):$root_password" | chpasswd
+    echo "$(whoami) password set"
+
+    echo "$username:$password" | chpasswd
+    echo "$username password set"
+fi
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -25,7 +35,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-ln -sf /usr/share/zoneinfo/America/Curacao /etc/localtime   # nog responsive maken
+ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
 hwclock --systohc
 
 echo -ne "
@@ -50,7 +60,7 @@ echo -ne "
 "
 
 # setting up host name
-echo "arch" >> /etc/hostname
+echo "${name_of_machine}" >> /etc/hostname
 systemctl enable NetworkManager
 
 
@@ -59,6 +69,9 @@ echo -ne "
                         Configure mkinitcpio
 -------------------------------------------------------------------------
 "
+
+# bios responsive
+
 
 sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 

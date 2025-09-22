@@ -234,17 +234,30 @@ while true; do
 	    echo "Incorrect username."
 done
 
-#Set Password
+# Set a root password
 while true; do
-    read -s -p "Please enter password: " password
+    read -s -p "Please enter root password: " root_password
+    read -s -p "Confirm password: " password_confirm
+    if [[ "$root_password" == "$password_confirm" ]]; then
+        echo "Password root setup success"
+        break
+    else
+        echo "Root passwords do not match. Try again."
+    fi
+done
+
+# Set a user password
+while true; do
+    read -s -p "Please enter user password for : " password
     read -s -p "Confirm password: " password_confirm
     if [[ "$password" == "$password_confirm" ]]; then
         echo "Password setup success"
         break
     else
-        echo "Passwords do not match. Try again."
+        echo "User passwords do not match. Try again."
     fi
 done
+
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -257,6 +270,40 @@ while true; do
 		break
 	fi
 done
+
+echo -ne "
+-------------------------------------------------------------------------
+                        Chose your timezone
+-------------------------------------------------------------------------
+"
+echo "Available regions:"
+ls /usr/share/zoneinfo/ | tr '\n' ' ' | sort
+echo ""
+
+while true; do
+    read -p "Enter your region (e.g., America, Europe, Asia): " region
+    if [[ -d "/usr/share/zoneinfo/$region" ]]; then
+        break
+    else
+        echo "Invalid region. Please try again."
+    fi
+done
+
+echo ""
+echo "Available cities/zones in $region:"
+ls "/usr/share/zoneinfo/$region" | tr '\n' ' ' | sort
+echo ""
+
+while true; do
+    read -p "Enter your city/zone (e.g., New_York, London, Tokyo): " city
+    if [[ -f "/usr/share/zoneinfo/$region/$city" ]]; then
+        timezone="$region/$city"
+        break
+    else
+        echo "Invalid city/zone. Please try again."
+    fi
+done
+echo "Timezone selected: $timezone"
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -330,8 +377,10 @@ ROOT_SIZE=$ROOT_SIZE
 
 # User & hostname creation
 username=$username
+root_password=$root_password
 password=$password
 name_of_machine=$name_of_machine
+timezone=$timezone
 
 # DE choice
 de_choice=$de_choice
