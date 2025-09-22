@@ -73,13 +73,14 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-echo "Please select a Desktop Environment:"
+echo "Please select a option:"
 echo "1) KDE Plasma"
 echo "2) GNOME"
 echo "3) Server"
+echo "4) Minimal"
 echo ""
 echo "Default is KDE (press Enter for default)"
-read -p "Enter your choice [1-3]: " de_choice
+read -p "Enter your choice [1-4]: " de_choice
 
 # Set default if empty
 if [[ -z "$de_choice" ]]; then
@@ -88,47 +89,32 @@ fi
 
 case $de_choice in
     1)
-        echo "Installing KDE Plasma..."
-        pacman -S --noconfirm --needed plasma-meta sddm
-        systemctl enable sddm
-        echo "KDE Plasma installed successfully!"
+        #echo "Installing KDE Plasma..."
+        #pacman -S --noconfirm --needed plasma-meta sddm
+        #systemctl enable sddm
+        #echo "KDE Plasma installed successfully!"
+        de_choice=KDE
         ;;
     2)
-         echo "Installing GNOME..."
-         pacman -S --noconfirm --needed gnome gdm
-         systemctl enable gdm
-         echo "GNOME installed successfully!"
+         #echo "Installing GNOME..."
+         #pacman -S --noconfirm --needed gnome gdm
+         #systemctl enable gdm
+         #echo "GNOME installed successfully!"
+         de_choice=GNOME
          ;;
     3)
         echo "Server setup"
-        echo "server packages... still in development"
+        de_choice=SERVER
         ;;
+    4)
+        echo "Minimal setup"
+        de_choice=MIN
     *)
-        echo "Invalid choice. Installing default (KDE)..."
-        pacman -S --noconfirm --needed plasma-meta sddm
-        systemctl enable sddm
-        echo "KDE Plasma installed successfully!"
+        #echo "Invalid choice. Installing Minimal setup"
+        #pacman -S --noconfirm --needed plasma-meta sddm
+        #systemctl enable sddm
+        #echo "KDE Plasma installed successfully!"
+        de_choice=MIN
         ;;
 
 esac
-
-if [[ $de_choice != 3 ]]; then
-
-    echo -ne "
-        -------------------------------------------------------------------------
-                        Installing Auto-cpufreq
-        -------------------------------------------------------------------------
-        "
-
-    git clone https://github.com/AdnanHodzic/auto-cpufreq.git
-    cd auto-cpufreq && ./auto-cpufreq-installer
-    cd ..
-fi
-
--------------------------------------------------------------------------
-                            Networking
--------------------------------------------------------------------------
-"
-
-echo "Nog aan werken"
-echo "ook prining support doen"
