@@ -355,10 +355,12 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-# Set partition names again for UUID collection
+# Set partition names again for UUID collection and for bios partition collection
 if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
+    partition1=${DISK}p1
     partition2=${DISK}p2
 else
+    partition1=${DISK}1
     partition2=${DISK}2
 fi
 
@@ -374,6 +376,7 @@ DISK_ENCRYPT=$disk_encrypt
 RAM_GB=$RAM_GB
 SWAP_SIZE=$SWAP_SIZE
 ROOT_SIZE=$ROOT_SIZE
+partition1=$partition1
 
 # User & hostname creation
 username=$username

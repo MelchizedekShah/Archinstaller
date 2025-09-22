@@ -1,6 +1,68 @@
 #!/bin/bash
 
+# funtion with all the variables that are handed over from 0-preinstall.sh
 source /usr/local/share/Archinstaller/vars.sh
+
+# bios setup function
+biossetup() {
+
+# mkinitcpio
+if [[ $DISK_ENCRYPT = 'y' ]]; then
+    sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+else
+    sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+fi
+
+# installing grub
+grub-install --target=i386-pc ${partition1}
+grub-mkconfig -o /boot/grub/grub.cfg
+
+}
+
+# efi setup function
+efisetup() {
+
+# mkinitcpio setup
+if [[ $DISK_ENCRYPT = 'y' ]]; then
+    sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+else
+    sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+fi
+
+# .preset files
+if [[ $de_choice != "SERVER" ]]
+cat > /etc/mkinitcpio.d/linux.preset <<'EOF'
+# mkinitcpio preset file for the 'linux' package
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux"
+
+PRESETS=('default')
+
+default_uki="/efi/EFI/Linux/arch-linux.efi"
+EOF
+fi
+
+cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
+# mkinitcpio preset file for the 'linux-lts' package
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-lts"
+
+PRESETS=('default')
+
+default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
+EOF
+
+# installing boot loader
+bootctl install
+cat > /efi/loader/loader.conf <<'EOF'
+default arch-linux.efi
+timeout 5
+console-mode auto
+editor no
+EOF
+
+systemctl enable systemd-boot-update.service
+}
 
 clear
 
@@ -65,67 +127,26 @@ systemctl enable NetworkManager
 
 
 echo -ne "
--------------------------------------------------------------------------
-                        Configure mkinitcpio
--------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+ Configure mkinitcpio & Configure the kernel cmdline & .preset file & Installing the bootloader
+------------------------------------------------------------------------------------------------
 "
-
-# bios responsive
-
-
-sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
-
+if [[ $PLATFORM == "EFI" ]]; then
+    efisetup
+    echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
+elif [[ $PLATFORM == "BIOS" ]]; then
+    biossetup
+    echo "cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root" >
+fi
 
 echo -ne "
 -------------------------------------------------------------------------
-                    Configure the kernel cmdline
+                            mkinitcpio
 -------------------------------------------------------------------------
 "
 
-echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
-
-
-
-echo -ne "
--------------------------------------------------------------------------
-                        .preset file
--------------------------------------------------------------------------
-"
-
-cat > /etc/mkinitcpio.d/linux.preset <<'EOF'
-# mkinitcpio preset file for the 'linux' package
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux"
-
-PRESETS=('default')
-
-default_uki="/efi/EFI/Linux/arch-linux.efi"
-EOF
-
-cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
-# mkinitcpio preset file for the 'linux-lts' package
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux-lts"
-
-PRESETS=('default')
-
-default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
-EOF
-
-
-echo -ne "
--------------------------------------------------------------------------
-                    Installing the bootloader
--------------------------------------------------------------------------
-"
-
-bootctl install
-cat > /efi/loader/loader.conf <<'EOF'
-default arch-linux.efi
-timeout 5
-console-mode auto
-editor no
-EOF
-
-systemctl enable systemd-boot-update.service
 mkinitcpio -P
+
+
+
+# Finished 1-preinstall.sh
