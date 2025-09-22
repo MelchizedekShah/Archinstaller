@@ -127,7 +127,7 @@ done
 
 LUKS_UUID=$(blkid -s UUID -o value "$partition2")
 mkdir -p /mnt/usr/local/share/Archinstaller && touch /mnt/usr/local/share/Archinstaller/vars.sh
-echo "LUKS_UUID=$LUKS_UUID" > /mnt/usr/local/share/Archinstaller/vars.sh
+echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
 
 echo -ne "
 -------------------------------------------------------------------------

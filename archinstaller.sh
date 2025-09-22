@@ -33,6 +33,13 @@ cp -r "$SCRIPT_DIR"/* /mnt/usr/local/share/Archinstaller/
 chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 
 
+#debug
+echo "Checking scripts inside /mnt:"
+ls -l /mnt/usr/local/share/Archinstaller/scripts/
+
+echo "Checking if bash exists inside chroot:"
+ls -l /mnt/bin/bash
+
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/1-preinstall.sh )|& tee 1-preinstall.log
 
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/2-setup.sh )|& tee 2-setup.log

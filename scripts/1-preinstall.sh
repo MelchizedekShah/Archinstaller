@@ -1,8 +1,6 @@
 #!/bin/bash
 
 source /usr/local/share/Archinstaller/vars.sh
-#source /mnt/usr/local/share/Archinstaller/vars.sh
-
 
 echo -ne "
 -------------------------------------------------------------------------
