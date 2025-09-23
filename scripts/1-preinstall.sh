@@ -43,7 +43,6 @@ PRESETS=('default')
 
 default_uki="/efi/EFI/Linux/arch-linux.efi"
 EOF
-fi
 
 cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
 # mkinitcpio preset file for the 'linux-lts' package
@@ -54,17 +53,43 @@ PRESETS=('default')
 
 default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
 EOF
+else
+    cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
+    ALL_config="/etc/mkinitcpio.conf"
+    ALL_kver="/boot/vmlinuz-linux-lts"
+
+    PRESETS=('default', 'fallback')
+
+    default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
+
+    fallback_uki="/efi/EFI/Linux/arch-linux-lts-fallback.efi"
+    fallback_options="-S autodetect"
+    EOF
+fi
+
 
 # installing boot loader
+
 bootctl install
+
+if [[ $de_choice == "SERVER" ]]; then
+cat > /efi/loader/loader.conf <<'EOF'
+default arch-linux-lts.efi
+timeout 5
+console-mode auto
+editor no
+EOF
+else
 cat > /efi/loader/loader.conf <<'EOF'
 default arch-linux.efi
 timeout 5
 console-mode auto
 editor no
 EOF
+fi
 
 systemctl enable systemd-boot-update.service
+
 }
 
 clear
@@ -150,7 +175,7 @@ if [[ $PLATFORM == "EFI" ]]; then
     if [[ $DISK_ENCRYPT = 'y' ]]; then
         echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
     else
-        echo "root=UUID=${LUKS_UUID} rw" > /etc/kernel/cmdline
+        echo "root=/dev/mapper/archvolume-root rw" > /etc/kernel/cmdline
     fi
 
 elif [[ $PLATFORM == "BIOS" ]]; then
