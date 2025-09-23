@@ -9,22 +9,27 @@ if [[ $cpufreq == y ]]; then
     cd ..
 fi
 
+
+if [[ de_choice != "SERVER" ]]; then
 echo -ne "
 -------------------------------------------------------------------------
                        Installing AUR Helper
 -------------------------------------------------------------------------
+"
+# remove then paru dir
+#
+if [ -d /home/${username}/paru ]; then
+    rm -rf /home/${username}/paru
+fi
 
 runuser -l ${username} <<'EOF'
-    set -e
     if ! command -v paru; then
         git clone https://aur.archlinux.org/paru.git ~/paru
         cd ~/paru
         makepkg -si --noconfirm
     fi
 EOF
-
-
-"
+fi
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -35,7 +40,3 @@ echo -ne "
 
 echo "Nog aan werken"
 echo "ook prining support doen"
-
-
-
-echo "path: ${pwd}"

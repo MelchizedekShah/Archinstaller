@@ -144,6 +144,7 @@ if [[ -f /sys/firmware/efi/fw_platform_size ]]; then
     fi
     platform=EFI
 else
+    "BIOS firmware detected"
     platform=BIOS
 fi
 
@@ -456,7 +457,7 @@ echo -ne "
 if [[ $de_choice != SERVER ]]; then
     packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git"
 else
-    packages="base bash linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git"
+    packages="base bash sudo linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git"
 fi
 
 while true; do
@@ -484,4 +485,5 @@ else
     echo "Check bios fstab... still in development"
 fi
 
-# Finished 0-preinstall.sh
+
+echo "Finished 0-preinstall.sh"

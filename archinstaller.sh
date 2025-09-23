@@ -34,7 +34,7 @@ chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/3-user.sh )|& tee 3-user.log
 
 # unmount all the mount points
-umount -R /mnt
+umount -R /mnt     #  if get error hide it
 
 echo -ne "
 -------------------------------------------------------------------------

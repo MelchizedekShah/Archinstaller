@@ -14,6 +14,7 @@ else
 fi
 
 # installing grub
+pacman -S grub --noconfirm --needed
 grub-install --target=i386-pc ${DISK}
 grub-mkconfig -o /boot/grub/grub.cfg
 
@@ -91,7 +92,7 @@ fi
 # Creating username
 useradd -m -G wheel -s /bin/bash ${username}
 
-echo "$username:${password}" | chpasswd
+echo "${username}:${password}" | chpasswd
 echo "$username password set"
 
 # Adding user to wheel group
@@ -103,9 +104,9 @@ echo -ne "
                             Time setup
 -------------------------------------------------------------------------
 "
-
 ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
 hwclock --systohc
+echo "Timezone: ${timezone}"
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -131,6 +132,7 @@ echo -ne "
 # setting up host name
 echo "${name_of_machine}" >> /etc/hostname
 systemctl enable NetworkManager
+echo "Hostname: ${name_of_machine}"
 
 
 echo -ne "
@@ -145,7 +147,7 @@ if [[ $PLATFORM == "EFI" ]]; then
     fi
 elif [[ $PLATFORM == "BIOS" ]]; then
     biossetup
-    echo "cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root" > /etc/default/grub
+    echo "cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root" >> /etc/default/grub
 fi
 
 echo -ne "
@@ -158,4 +160,4 @@ mkinitcpio -P
 
 
 
-# Finished 1-preinstall.sh
+echo "Finished 1-preinstall.sh"

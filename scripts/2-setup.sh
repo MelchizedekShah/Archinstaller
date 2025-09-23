@@ -46,6 +46,8 @@ elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
     pacman -S --noconfirm --needed vulkan-intel mesa
 elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
     pacman -S --noconfirm --needed vulkan-intel mesa
+else
+    echo "Not installing gpu drivers"
 fi
 
 
@@ -69,7 +71,11 @@ case $de_choice in
          echo "GNOME installed successfully!"
          ;;
     *)
-        echo ""
+        echo "Server or minimum setup"
+        echo "Not installing DE"
         ;;
 
     esac
+
+
+echo "Finished 2-setup.sh"
