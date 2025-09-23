@@ -195,7 +195,7 @@ done
 while true; do
     read -s -p "Please enter root password: " root_password
     echo ""
-    if [[ $password < 2 ]]; then
+    if [[ $root_password < 2 ]]; then
            continue
     fi
     read -s -p "Confirm password: " password_confirm
