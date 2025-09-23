@@ -10,7 +10,7 @@ if [[ $cpufreq == y ]]; then
 fi
 
 
-if [[ de_choice != "SERVER" ]]; then
+if [[ $de_choice != "SERVER" ]]; then
 echo -ne "
 -------------------------------------------------------------------------
                        Installing AUR Helper
