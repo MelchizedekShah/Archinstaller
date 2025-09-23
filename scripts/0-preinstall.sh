@@ -76,16 +76,17 @@ create_filesystems() {
             mkfs.ext4 /dev/mapper/archvolume-root
             mkfs.ext4 /dev/mapper/archvolume-home
             mkswap /dev/mapper/archvolume-swap
+            # Reduce home partition by 256M to leave some free space
+            lvreduce -L -256M --resizefs archvolume/home
         fi
     else
         # Create filesystems
         mkfs.ext4 /dev/mapper/archvolume-root
         mkfs.ext4 /dev/mapper/archvolume-home
         mkswap /dev/mapper/archvolume-swap
-
+        # Reduce home partition by 256M to leave some free space
+        lvreduce -L -256M --resizefs archvolume/home
     fi
-    # Reduce home partition by 256M to leave some free space
-    lvreduce -L -256M --resizefs archvolume/home
 }
 
 mount_common_filesystems() {
@@ -178,9 +179,11 @@ while true; do
     echo ""
     read -s -p "Confirm password: " password_confirm
     if [[ "$password" == "$password_confirm" ]]; then
+        echo ""
         echo "Password setup success"
         break
     else
+        echo ""
         echo "User passwords do not match. Try again."
     fi
 done
@@ -191,9 +194,11 @@ while true; do
     echo ""
     read -s -p "Confirm password: " password_confirm
     if [[ "$root_password" == "$password_confirm" ]]; then
+        echo ""
         echo "Password root setup success"
         break
     else
+        echo ""
         echo "Root passwords do not match. Try again."
     fi
 done
@@ -289,11 +294,11 @@ esac
 
 # filesystem choice for server setup
 if [[ $de_choice == "SERVER" ]]; then
-    echo -ne "
-    -------------------------------------------------------------------------
+echo -ne "
+-------------------------------------------------------------------------
                               Server filesystem
-    -------------------------------------------------------------------------
-    "
+-------------------------------------------------------------------------
+"
     echo "XFS: large files, big data, or servers where performance and scalability matter more than shrinkability."
     echo "EXT4: general-purpose servers, small web apps, and situations where simplicity and reliability matter."
     echo "Please select a option:"
@@ -517,8 +522,12 @@ echo -ne "
 
 if [[ $de_choice != SERVER ]]; then
     packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
-else
-    packages="base base-devel bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
+elif [[ $de_choice == SERVER ]]; then
+    if [[ $server_file == "XFS" ]]; then
+        packages="xfsprogs base base-devel bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
+    else
+        packages="base base-devel bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
+    fi
 fi
 
 while true; do
