@@ -9,10 +9,33 @@ if [[ $cpufreq == y ]]; then
     cd ..
 fi
 
+echo -ne "
+-------------------------------------------------------------------------
+                       Installing AUR Helper
+-------------------------------------------------------------------------
+
+runuser -l ${username} <<'EOF'
+    set -e
+    if ! command -v paru; then
+        git clone https://aur.archlinux.org/paru.git ~/paru
+        cd ~/paru
+        makepkg -si --noconfirm
+    fi
+EOF
+
+
+"
+
+echo -ne "
 -------------------------------------------------------------------------
                             Networking
 -------------------------------------------------------------------------
+
 "
 
 echo "Nog aan werken"
 echo "ook prining support doen"
+
+
+
+echo "path: ${pwd}"
