@@ -176,6 +176,9 @@ done
 # Set a user password
 while true; do
     read -s -p "Please enter user password: " password
+    if [[ $password < 2 ]]; then
+        continue
+    fi
     echo ""
     read -s -p "Confirm password: " password_confirm
     if [[ "$password" == "$password_confirm" ]]; then
@@ -191,6 +194,9 @@ done
 # Set a root password
 while true; do
     read -s -p "Please enter root password: " root_password
+    if [[ $password < 2 ]]; then
+           continue
+    fi
     echo ""
     read -s -p "Confirm password: " password_confirm
     if [[ "$root_password" == "$password_confirm" ]]; then
