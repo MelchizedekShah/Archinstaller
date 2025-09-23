@@ -66,17 +66,30 @@ create_filesystems() {
                     Creating filesystems
 -------------------------------------------------------------------------
 "
-    # Create filesystems
-    mkfs.ext4 /dev/mapper/archvolume-root
-    mkfs.ext4 /dev/mapper/archvolume-home
-    mkswap /dev/mapper/archvolume-swap
+    # Check if the setup is server with Xfs else use default setup ext4
+    if [[ $de_choice == "SERVER" ]]; then
+        if [[ $server_file == "XFS" ]]; then
+            mkfs.xfs /dev/mapper/archvolume-root
+            mkfs.xfs /dev/mapper/archvolume-home
+            mkswap /dev/mapper/archvolume-swap
+        else
+            mkfs.ext4 /dev/mapper/archvolume-root
+            mkfs.ext4 /dev/mapper/archvolume-home
+            mkswap /dev/mapper/archvolume-swap
+        fi
+    else
+        # Create filesystems
+        mkfs.ext4 /dev/mapper/archvolume-root
+        mkfs.ext4 /dev/mapper/archvolume-home
+        mkswap /dev/mapper/archvolume-swap
 
+    fi
     # Reduce home partition by 256M to leave some free space
     lvreduce -L -256M --resizefs archvolume/home
 }
 
 mount_common_filesystems() {
-    # Mount common filesystems
+    # Mount the filesystems
     mount /dev/mapper/archvolume-root /mnt
     mkdir /mnt/home
     mount /dev/mapper/archvolume-home /mnt/home
@@ -114,10 +127,22 @@ biossetup() {
     create_filesystems
     mount_common_filesystems
 
-    # Setup boot partition
-    mkfs.ext4 ${partition1}
-    mkdir /mnt/boot
-    mount ${partition1} /mnt/boot
+    if [[ $de_choice == "SERVER" ]]; then
+        if [[ $server_file == "XFS" ]]; then
+            mkfs.xfs ${partition1}
+            mkdir /mnt/boot
+            mount ${partition1} /mnt/boot
+        else
+            mkfs.ext4 ${partition1}
+            mkdir /mnt/boot
+            mount ${partition1} /mnt/boot
+        fi
+    else
+        # Setup boot partition with ext4
+        mkfs.ext4 ${partition1}
+        mkdir /mnt/boot
+        mount ${partition1} /mnt/boot
+    fi
 
     # Confirmation step
       while true; do
@@ -129,94 +154,6 @@ biossetup() {
       done
 }
 
-echo -ne "
--------------------------------------------------------------------------
-                    Checking firmware platform
--------------------------------------------------------------------------
-"
-
-if [[ -f /sys/firmware/efi/fw_platform_size ]]; then
-    EFI_SIZE=$(cat /sys/firmware/efi/fw_platform_size)
-    echo "EFI platform size detected: $EFI_SIZE-bit"
-    if [[ $EFI_SIZE != "64" ]]; then
-        echo "Not supported exiting..."
-        exit 1
-    fi
-    platform=EFI
-else
-    echo "BIOS firmware detected"
-    platform=BIOS
-fi
-
-echo -ne "
--------------------------------------------------------------------------
-                    Formatting the disk
--------------------------------------------------------------------------
-"
-
-echo "Available disks:"
-lsblk -d -o NAME,SIZE,MODEL
-
-while true; do
-    read -p "Enter disk name (e.g., sda): " DISK_NAME
-    DISK="/dev/$DISK_NAME"
-    if [[ -b "$DISK" ]]; then
-        break
-    else
-        echo "Invalid disk. Try again."
-    fi
-done
-
-while true; do
-    read -p "Do you want to encrypt your system? (y/n): " ENCRYPT
-    if [[ $ENCRYPT == "y" || $ENCRYPT == "Y" ]]; then
-        disk_encrypt=y
-        break
-    elif [[ $ENCRYPT == "n" || $ENCRYPT == "N" ]]; then
-        disk_encrypt=n
-        break
-    else
-        echo "Enter a valid input"
-    fi
-done
-
-echo "***********************************************************"
-echo " WARNING: You are about to completely WIPE ${DISK}!"
-echo " All data on this disk will be LOST forever."
-echo "***********************************************************"
-while true; do
-    read -p "Continue (y/n) " confirm
-    if [[ $confirm == "y" || $confirm == "Y" ]]; then
-        break
-    elif [[ $confirm == "n" || $confirm == "N" ]]; then
-        exit 0
-    else
-        echo "Enter a valid input"
-    fi
-done
-
-# Getting rid of everything
-umount -A --recursive /mnt 2>/dev/null
-sgdisk -Z ${DISK}
-sgdisk -a 2048 -o ${DISK}
-
-# Create partitions based on platform
-if [[ $platform == "EFI" ]]; then
-    sgdisk -n 1::+3G --typecode=1:ef00 --change-name=1:'EFIBOOT' ${DISK}
-    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
-    partprobe ${DISK}
-    efisetup
-elif [[ $platform == "BIOS" ]]; then
-    sgdisk -n 1::+1G --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
-    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
-    partprobe ${DISK}
-    biossetup
-else
-    echo "ERROR: Unknown platform, exiting..."
-    exit 1
-fi
-
-# done with disk setup
 
 # Getting user info for later
 # set username
@@ -350,6 +287,130 @@ case $de_choice in
 
 esac
 
+# filesystem choice for server setup
+if [[ $de_choice == "SERVER" ]]; then
+    echo -ne "
+    -------------------------------------------------------------------------
+                              Server filesystem
+    -------------------------------------------------------------------------
+    "
+    echo "XFS: large files, big data, or servers where performance and scalability matter more than shrinkability."
+    echo "EXT4: general-purpose servers, small web apps, and situations where simplicity and reliability matter."
+    echo "Please select a option:"
+    echo "1) XFS"
+    echo "2) EXT4"
+    echo "Default is XFS (press Enter for default)"
+    read -p "Enter your choice [1-2]: " server_file
+
+    # Set default if empty
+    if [[ -z "$server_file" ]]; then
+        server_file=1
+    fi
+
+    case $server_file in
+        1)
+            echo "Setting up XFS filesytem"
+            server_file=XFS
+            ;;
+        2)
+            echo "Setting up EXT4 filesytem"
+            server_file=EXT4
+            ;;
+        *)
+            echo "Setting up default: XFS filesytem"
+            server_file=XFS
+            ;;
+    esac
+fi
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Checking firmware platform
+-------------------------------------------------------------------------
+"
+
+if [[ -f /sys/firmware/efi/fw_platform_size ]]; then
+    EFI_SIZE=$(cat /sys/firmware/efi/fw_platform_size)
+    echo "EFI platform size detected: $EFI_SIZE-bit"
+    if [[ $EFI_SIZE != "64" ]]; then
+        echo "Not supported exiting..."
+        exit 1
+    fi
+    platform=EFI
+else
+    echo "BIOS firmware detected"
+    platform=BIOS
+fi
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Formatting the disk
+-------------------------------------------------------------------------
+"
+
+echo "Available disks:"
+lsblk -d -o NAME,SIZE,MODEL
+
+while true; do
+    read -p "Enter disk name (e.g., sda): " DISK_NAME
+    DISK="/dev/$DISK_NAME"
+    if [[ -b "$DISK" ]]; then
+        break
+    else
+        echo "Invalid disk. Try again."
+    fi
+done
+
+while true; do
+    read -p "Do you want to encrypt your system? (y/n): " ENCRYPT
+    if [[ $ENCRYPT == "y" || $ENCRYPT == "Y" ]]; then
+        disk_encrypt=y
+        break
+    elif [[ $ENCRYPT == "n" || $ENCRYPT == "N" ]]; then
+        disk_encrypt=n
+        break
+    else
+        echo "Enter a valid input"
+    fi
+done
+
+echo "***********************************************************"
+echo " WARNING: You are about to completely WIPE ${DISK}!"
+echo " All data on this disk will be LOST forever."
+echo "***********************************************************"
+while true; do
+    read -p "Continue (y/n) " confirm
+    if [[ $confirm == "y" || $confirm == "Y" ]]; then
+        break
+    elif [[ $confirm == "n" || $confirm == "N" ]]; then
+        exit 0
+    else
+        echo "Enter a valid input"
+    fi
+done
+
+# Getting rid of everything
+umount -A --recursive /mnt 2>/dev/null
+sgdisk -Z ${DISK}
+sgdisk -a 2048 -o ${DISK}
+
+# Create partitions based on platform
+if [[ $platform == "EFI" ]]; then
+    sgdisk -n 1::+3G --typecode=1:ef00 --change-name=1:'EFIBOOT' ${DISK}
+    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
+    partprobe ${DISK}
+    efisetup
+elif [[ $platform == "BIOS" ]]; then
+    sgdisk -n 1::+1G --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
+    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
+    partprobe ${DISK}
+    biossetup
+else
+    echo "ERROR: Unknown platform, exiting..."
+    exit 1
+fi
+
+# done with disk setup
 
 if [[ $de_choice != "SERVER" ]]; then
 echo -ne "
