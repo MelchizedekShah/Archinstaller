@@ -165,6 +165,8 @@ elif [[ $PLATFORM == "BIOS" ]]; then
         # 2. Overwrite GRUB_CMDLINE_LINUX completely
         sed -i "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root\"|" /etc/default/grub
     fi
+
+    grub-mkconfig -o /boot/grub/grub.cfg
 fi
 
 echo -ne "
