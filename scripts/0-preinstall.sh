@@ -236,7 +236,7 @@ done
 
 # Set a user password
 while true; do
-    read -s -p "Please enter user password for : " password
+    read -s -p "Please enter user password: " password
     echo ""
     read -s -p "Confirm password: " password_confirm
     if [[ "$password" == "$password_confirm" ]]; then
