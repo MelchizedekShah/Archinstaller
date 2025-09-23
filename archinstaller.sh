@@ -31,6 +31,7 @@ chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/1-preinstall.sh )|& tee 1-preinstall.log
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/2-setup.sh )|& tee 2-setup.log
+( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/3-user.sh )|& tee 3-user.log
 
 # unmount all the mount points
 umount -R /mnt

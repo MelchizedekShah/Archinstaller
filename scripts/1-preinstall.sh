@@ -14,7 +14,7 @@ else
 fi
 
 # installing grub
-grub-install --target=i386-pc ${partition1}
+grub-install --target=i386-pc ${DISK}
 grub-mkconfig -o /boot/grub/grub.cfg
 
 }
@@ -30,7 +30,7 @@ else
 fi
 
 # .preset files
-if [[ $de_choice != "SERVER" ]]
+if [[ $de_choice != "SERVER" ]]; then
 cat > /etc/mkinitcpio.d/linux.preset <<'EOF'
 # mkinitcpio preset file for the 'linux' package
 ALL_config="/etc/mkinitcpio.conf"
@@ -140,10 +140,12 @@ echo -ne "
 "
 if [[ $PLATFORM == "EFI" ]]; then
     efisetup
-    echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
+    if [[ $DISK_ENCRYPT = 'y' ]]; then
+        echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
+    fi
 elif [[ $PLATFORM == "BIOS" ]]; then
     biossetup
-    echo "cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root" >
+    echo "cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root" > /etc/default/grub
 fi
 
 echo -ne "
