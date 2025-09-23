@@ -33,8 +33,28 @@ chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/2-setup.sh )|& tee 2-setup.log
 ( arch-chroot /mnt /usr/local/share/Archinstaller/scripts/3-user.sh )|& tee 3-user.log
 
+# Copy everything again after the installation
+# To get the complete log files on the host
+cp -r "$SCRIPT_DIR"/* /mnt/usr/local/share/Archinstaller/
+
 # unmount all the mount points
-umount -R /mnt     #  if get error hide it
+umount -R /mnt 2>/dev/null
+
+clear
+
+echo -ne "
+-------------------------------------------------------------------------
+    _             _     _           _        _ _
+   / \   _ __ ___| |__ (_)_ __  ___| |_ __ _| | | ___ _ __
+  / _ \ | '__/ __| '_ \| | '_ \/ __| __/ _  | | |/ _ \ '__|
+ / ___ \| | | (__| | | | | | | \__ \ || (_| | | |  __/ |
+/_/   \_\_|  \___|_| |_|_|_| |_|___/\__\__,_|_|_|\___|_|
+-------------------------------------------------------------------------
+                    Automated Arch Linux Installer
+-------------------------------------------------------------------------
+"
+
+sleep 1
 
 echo -ne "
 -------------------------------------------------------------------------
