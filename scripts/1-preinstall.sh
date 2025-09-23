@@ -141,13 +141,30 @@ echo -ne "
 ------------------------------------------------------------------------------------------------
 "
 if [[ $PLATFORM == "EFI" ]]; then
+    # efi setup funtion (function above of the page)
     efisetup
+
+    # Check if the disk in enqrypted
     if [[ $DISK_ENCRYPT = 'y' ]]; then
         echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
     fi
+
 elif [[ $PLATFORM == "BIOS" ]]; then
+    # Bios setup funtion (function above of the page)
     biossetup
-    echo "cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root" >> /etc/default/grub
+
+    # Detecting other operating systems (This is handy if the user has multiple disks on his bios computer)
+    pacman -S os-prober --needed --noconfirm
+    echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub
+
+    # Check if the disk is encrypted
+    if [[ $DISK_ENCRYPT = 'y' ]]; then
+        # 1. Force enable cryptodisk
+        sed -i 's/^#\?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
+
+        # 2. Overwrite GRUB_CMDLINE_LINUX completely
+        sed -i "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root\"|" /etc/default/grub
+    fi
 fi
 
 echo -ne "
