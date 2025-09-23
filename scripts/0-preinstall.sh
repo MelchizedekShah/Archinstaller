@@ -342,11 +342,33 @@ case $de_choice in
         de_choice=MIN
         ;;
     *)
-        echo "Invalid choice. Installing Minimal setup"
+        echo "Invalid choice. Setting up minimal setup"
         de_choice=MIN
         ;;
 
 esac
+
+
+if [[ $de_choice != "SERVER" ]]; then
+echo -ne "
+-------------------------------------------------------------------------
+                         Auto-cpufreq setup
+-------------------------------------------------------------------------
+"
+while true; do
+    read -p "Do you want to install Auto-cpufreq? (y/n): " cpufreq
+    if [[ $cpufreq == 'y' || $cpufreq == 'Y' ]]; then
+        cpufreq=y
+        break
+    elif [[ $cpufreq == 'n' || $cpufreq == 'N' ]]; then
+        cpufreq=n
+        break
+    else
+        echo "Enter a valid input"
+done
+else
+    cpufreq=n
+fi
 
 # Store variables for later use
 echo -ne "
@@ -387,6 +409,10 @@ timezone=$timezone
 
 # DE choice
 de_choice=$de_choice
+
+# Power management
+cpufreq=$cpufreq
+
 EOF
 
 # Store UUIDs based on setup

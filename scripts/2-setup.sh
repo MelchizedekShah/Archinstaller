@@ -1,25 +1,7 @@
 #!/bin/bash
 
-
-echo -ne "
--------------------------------------------------------------------------
-                        Adding a user
--------------------------------------------------------------------------
-"
-
-while true
-	do
-		read -p "Please enter username:" username
-		if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-		then
-			break
-		fi
-		echo "Incorrect username."
-	done
-
-useradd -m -G wheel -s /bin/bash ${username}
-passwd ${username}
-sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+# funtion with all the variables that are handed over from 0-preinstall.sh
+source /usr/local/share/Archinstaller/vars.sh
 
 
 echo -ne "
@@ -73,48 +55,21 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-echo "Please select a option:"
-echo "1) KDE Plasma"
-echo "2) GNOME"
-echo "3) Server"
-echo "4) Minimal"
-echo ""
-echo "Default is KDE (press Enter for default)"
-read -p "Enter your choice [1-4]: " de_choice
-
-# Set default if empty
-if [[ -z "$de_choice" ]]; then
-    de_choice=1
-fi
-
 case $de_choice in
-    1)
-        #echo "Installing KDE Plasma..."
-        #pacman -S --noconfirm --needed plasma-meta sddm
-        #systemctl enable sddm
-        #echo "KDE Plasma installed successfully!"
-        de_choice=KDE
+    KDE)
+        echo "Installing KDE Plasma..."
+        pacman -S --noconfirm --needed plasma-meta sddm
+        systemctl enable sddm
+        echo "KDE Plasma installed successfully!"
         ;;
-    2)
-         #echo "Installing GNOME..."
-         #pacman -S --noconfirm --needed gnome gdm
-         #systemctl enable gdm
-         #echo "GNOME installed successfully!"
-         de_choice=GNOME
+    GNOME)
+         echo "Installing GNOME..."
+         pacman -S --noconfirm --needed gnome gdm
+         systemctl enable gdm
+         echo "GNOME installed successfully!"
          ;;
-    3)
-        echo "Server setup"
-        de_choice=SERVER
-        ;;
-    4)
-        echo "Minimal setup"
-        de_choice=MIN
     *)
-        #echo "Invalid choice. Installing Minimal setup"
-        #pacman -S --noconfirm --needed plasma-meta sddm
-        #systemctl enable sddm
-        #echo "KDE Plasma installed successfully!"
-        de_choice=MIN
+        echo ""
         ;;
 
-esac
+    esac

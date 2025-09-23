@@ -78,18 +78,25 @@ echo -ne "
 -------------------------------------------------------------------------
 
 -------------------------------------------------------------------------
-                        Password setup
+                  Creating user & Password setup
 -------------------------------------------------------------------------
 "
 
 if [[ $(whoami) = "root" ]]; then
     # use chpasswd to enter $USERNAME:$password
-    echo "$(whoami):$root_password" | chpasswd
+    echo "$(whoami):${root_password}" | chpasswd
     echo "$(whoami) password set"
-
-    echo "$username:$password" | chpasswd
-    echo "$username password set"
 fi
+
+# Creating username
+useradd -m -G wheel -s /bin/bash ${username}
+
+echo "$username:${password}" | chpasswd
+echo "$username password set"
+
+# Adding user to wheel group
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
 
 echo -ne "
 -------------------------------------------------------------------------
