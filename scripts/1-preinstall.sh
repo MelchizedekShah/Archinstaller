@@ -8,7 +8,7 @@ biossetup() {
 
 # mkinitcpio
 if [[ $DISK_ENCRYPT = 'y' ]]; then
-    pamcan -S cryptsetup --noconfirm --needed
+    pacman -S cryptsetup --noconfirm --needed
     sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 else
     sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
@@ -54,17 +54,17 @@ PRESETS=('default')
 default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
 EOF
 else
-    cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
-    ALL_config="/etc/mkinitcpio.conf"
-    ALL_kver="/boot/vmlinuz-linux-lts"
+cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-lts"
 
-    PRESETS=('default', 'fallback')
+PRESETS=('default', 'fallback')
 
-    default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
+default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
 
-    fallback_uki="/efi/EFI/Linux/arch-linux-lts-fallback.efi"
-    fallback_options="-S autodetect"
-    EOF
+fallback_uki="/efi/EFI/Linux/arch-linux-lts-fallback.efi"
+fallback_options="-S autodetect"
+EOF
 fi
 
 
