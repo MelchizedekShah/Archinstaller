@@ -338,6 +338,7 @@ echo -ne "
     esac
 fi
 
+
 echo -ne "
 -------------------------------------------------------------------------
                     Checking firmware platform
@@ -427,27 +428,6 @@ fi
 
 # done with disk setup
 
-if [[ $de_choice != "SERVER" ]]; then
-echo -ne "
--------------------------------------------------------------------------
-                         Auto-cpufreq setup
--------------------------------------------------------------------------
-"
-while true; do
-    read -p "Do you want to install Auto-cpufreq? (y/n): " cpufreq
-    if [[ $cpufreq == 'y' || $cpufreq == 'Y' ]]; then
-        cpufreq=y
-        break
-    elif [[ $cpufreq == 'n' || $cpufreq == 'N' ]]; then
-        cpufreq=n
-        break
-    else
-        echo "Enter a valid input"
-    fi
-done
-else
-    cpufreq=n
-fi
 
 # Store variables for later use
 echo -ne "
@@ -490,8 +470,6 @@ timezone=$timezone
 # DE choice
 de_choice=$de_choice
 
-# Power management
-cpufreq=$cpufreq
 
 EOF
 
