@@ -149,6 +149,8 @@ if [[ $PLATFORM == "EFI" ]]; then
     # Check if the disk in enqrypted
     if [[ $DISK_ENCRYPT = 'y' ]]; then
         echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
+    else
+        echo "root=${LUKS_UUID} rw" > /etc/kernel/cmdline
     fi
 
 elif [[ $PLATFORM == "BIOS" ]]; then
