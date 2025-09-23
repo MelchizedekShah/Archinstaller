@@ -232,6 +232,10 @@ echo ""
 
 while true; do
     read -p "Enter your region (e.g., America, Europe, Asia): " region
+    echo ""
+    if [[ $region < 2 ]]; then
+        continue
+    fi
     if [[ -d "/usr/share/zoneinfo/$region" ]]; then
         break
     else
