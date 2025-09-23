@@ -150,7 +150,7 @@ if [[ $PLATFORM == "EFI" ]]; then
     if [[ $DISK_ENCRYPT = 'y' ]]; then
         echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
     else
-        echo "root=${LUKS_UUID} rw" > /etc/kernel/cmdline
+        echo "root=UUID=${LUKS_UUID} rw" > /etc/kernel/cmdline
     fi
 
 elif [[ $PLATFORM == "BIOS" ]]; then
