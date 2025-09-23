@@ -144,7 +144,7 @@ if [[ -f /sys/firmware/efi/fw_platform_size ]]; then
     fi
     platform=EFI
 else
-    "BIOS firmware detected"
+    echo "BIOS firmware detected"
     platform=BIOS
 fi
 
