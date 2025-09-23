@@ -8,6 +8,7 @@ biossetup() {
 
 # mkinitcpio
 if [[ $DISK_ENCRYPT = 'y' ]]; then
+    pamcan -S cryptsetup --noconfirm --needed
     sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 else
     sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
@@ -25,6 +26,7 @@ efisetup() {
 
 # mkinitcpio setup
 if [[ $DISK_ENCRYPT = 'y' ]]; then
+    pamcan -S cryptsetup --noconfirm --needed
     sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 else
     sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block lvm2 filesystems fsck)/' /etc/mkinitcpio.conf

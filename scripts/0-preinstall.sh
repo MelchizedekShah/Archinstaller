@@ -455,9 +455,9 @@ echo -ne "
 "
 
 if [[ $de_choice != SERVER ]]; then
-    packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git"
+    packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
 else
-    packages="base bash sudo linux-firmware linux-lts gdisk lvm2 cryptsetup networkmanager vim man-db man-pages texinfo git"
+    packages="base base-devel bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
 fi
 
 while true; do
