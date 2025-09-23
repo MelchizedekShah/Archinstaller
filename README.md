@@ -2,4 +2,4 @@
 A script to install arch linux
 
 
-UEFI SERVER setup met disk encryption werkt voor ext4 en xfs
+UEFI SERVER setup with and without disk encryption works with both provided filesystems
