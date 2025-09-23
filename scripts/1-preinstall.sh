@@ -58,7 +58,7 @@ cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
 ALL_config="/etc/mkinitcpio.conf"
 ALL_kver="/boot/vmlinuz-linux-lts"
 
-PRESETS=('default', 'fallback')
+PRESETS=('default' 'fallback')
 
 default_uki="/efi/EFI/Linux/arch-linux-lts.efi"
 
