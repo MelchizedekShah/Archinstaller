@@ -227,28 +227,17 @@ echo -ne "
 "
 
 while true; do
-	read -p "Please enter username:" username
+	read -p "Please enter username: " username
 	if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]; then
 		break
 	fi
 	    echo "Incorrect username."
 done
 
-# Set a root password
-while true; do
-    read -s -p "Please enter root password: " root_password
-    read -s -p "Confirm password: " password_confirm
-    if [[ "$root_password" == "$password_confirm" ]]; then
-        echo "Password root setup success"
-        break
-    else
-        echo "Root passwords do not match. Try again."
-    fi
-done
-
 # Set a user password
 while true; do
     read -s -p "Please enter user password for : " password
+    echo ""
     read -s -p "Confirm password: " password_confirm
     if [[ "$password" == "$password_confirm" ]]; then
         echo "Password setup success"
@@ -258,6 +247,18 @@ while true; do
     fi
 done
 
+# Set a root password
+while true; do
+    read -s -p "Please enter root password: " root_password
+    echo ""
+    read -s -p "Confirm password: " password_confirm
+    if [[ "$root_password" == "$password_confirm" ]]; then
+        echo "Password root setup success"
+        break
+    else
+        echo "Root passwords do not match. Try again."
+    fi
+done
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -265,7 +266,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 while true; do
-	read -p "Please name your machine:" name_of_machine
+	read -p "Please name your machine: " name_of_machine
 	if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]; then
 		break
 	fi
@@ -365,6 +366,7 @@ while true; do
         break
     else
         echo "Enter a valid input"
+    fi
 done
 else
     cpufreq=n
