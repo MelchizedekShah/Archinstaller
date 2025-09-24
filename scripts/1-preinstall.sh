@@ -51,7 +51,7 @@ fallback_image="/boot/initramfs-linux-lts-fallback.img"
 fallback_options="-S autodetect"
 EOF
 fi
-
+mkinitcpio -P
 # installing grub
 pacman -S grub os-prober --noconfirm --needed
 grub-install --target=i386-pc ${DISK}
