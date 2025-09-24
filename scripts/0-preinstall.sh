@@ -476,8 +476,11 @@ EOF
 # Store UUIDs based on setup
 if [[ $disk_encrypt == "y" ]]; then
     LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+    ROOT_UUID=$(blkid -s UUID -o value /dev/mapper/archvolume-root)
     echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
+    echo "ROOT_UUID=$ROOT_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
     echo "Stored LUKS UUID: $LUKS_UUID"
+    echo "Stored ROOT UUID: $ROOT_UUID"
 fi
 
 echo "Configuration saved to /mnt/usr/local/share/Archinstaller/vars.sh"

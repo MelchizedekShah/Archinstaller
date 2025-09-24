@@ -191,8 +191,8 @@ elif [[ $PLATFORM == "BIOS" ]]; then
         # 1. Force enable cryptodisk
         sed -i 's/^#\?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
 
-        # 2. Overwrite GRUB_CMDLINE_LINUX completely
-        sed -i "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root\"|" /etc/default/grub
+        # 2. Append to GRUB_CMDLINE_LINUX_DEFAULT instead of overwriting
+        sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=UUID=${ROOT_UUID}\"|" /etc/default/grub
     fi
 
     grub-mkconfig -o /boot/grub/grub.cfg
