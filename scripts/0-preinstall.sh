@@ -398,8 +398,8 @@ Timezone:             $timezone
 Username:             $username
 Root Password:        $(printf '%*s' ${#root_password} '' | tr ' ' '*')
 User Password:        $(printf '%*s' ${#password} '' | tr ' ' '*')
-
 Installation Type:    $de_choice
+
 "
 $(if [[ $de_choice == "SERVER" ]]; then
 echo "Server Filesystem:    $server_file"
