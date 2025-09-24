@@ -396,8 +396,9 @@ Disk Encryption:      $(if [[ $disk_encrypt == "y" ]]; then echo "ENABLED (LUKS)
 Hostname:             $name_of_machine
 Timezone:             $timezone
 Username:             $username
-Root Password:        $root_password
-User Password:        $password
+Root Password:        $(printf '%*s' ${#root_password} '' | tr ' ' '*')
+User Password:        $(printf '%*s' ${#password} '' | tr ' ' '*')
+
 Installation Type:    $de_choice
 "
 $(if [[ $de_choice == "SERVER" ]]; then
