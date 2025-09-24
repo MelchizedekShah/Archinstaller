@@ -309,26 +309,8 @@ fi
 
 gpu_type=$(lspci)
 if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
-    echo ""
-    echo "========================================="
-    echo "        NVIDIA GPU DETECTED"
-    echo "========================================="
-    echo ""
-    lspci | grep -E "VGA|3D|Display"
-    echo ""
-    echo "IMPORTANT: Choose based on your setup:"
-    echo ""
-    echo "• If you have DUAL GRAPHICS (Intel/AMD + NVIDIA):"
-    echo "  → You can SKIP this (select 'n')"
-    echo "  → System will use integrated graphics initially"
-    echo "  → You can install NVIDIA drivers later if needed"
-    echo ""
-    echo "• If you have NVIDIA ONLY:"
-    echo "  → You MUST install drivers (select 'y')"
-    echo "  → Otherwise you may have no display after reboot!"
-    echo ""
-    echo "• If unsure, check your laptop stickers or specs"
-    echo ""
+    echo "NVIDIA GPU DETECTED"
+
     while true; do
         read -p "Install proprietary NVIDIA drivers? (y/n): " nvidia_choice
 
