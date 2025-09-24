@@ -359,7 +359,6 @@ echo -ne "
 "Please review your installation configuration:"
 
 Firmware Type:        $platform
-Target Disk:          $DISK
 Disk Encryption:      $(if [[ $disk_encrypt == "y" ]]; then echo "ENABLED (LUKS)"; else echo "DISABLED"; fi)
 Hostname:             $name_of_machine
 Timezone:             $timezone
