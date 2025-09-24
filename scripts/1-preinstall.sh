@@ -53,10 +53,31 @@ EOF
 fi
 
 # installing grub
-pacman -S grub --noconfirm --needed
+pacman -S grub os-prober --noconfirm --needed
 grub-install --target=i386-pc ${DISK}
-grub-mkconfig -o /boot/grub/grub.cfg
 
+# Setting up grub settings
+
+# Detecting other operating systems (This is handy if the user has multiple disks on his bios computer)
+echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub
+
+# Disable submenu's good for multiple kernels
+sed -i 's/^#GRUB_DISABLE_SUBMENU=/GRUB_DISABLE_SUBMENU=/' /etc/default/grub
+
+# That grub will boot in the same kernel as last boot as default
+sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub
+sed -i 's/^#GRUB_SAVEDEFAULT=/GRUB_SAVEDEFAULT=/' /etc/default/grub
+
+# Check if the disk is encrypted
+if [[ $DISK_ENCRYPT = 'y' ]]; then
+    # 1. Force enable cryptodisk
+    sed -i 's/^#\?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
+
+    # 2. Append to GRUB_CMDLINE_LINUX_DEFAULT instead of overwriting
+    sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=UUID=${ROOT_UUID}\"|" /etc/default/grub
+fi
+
+grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 # efi setup function
@@ -127,6 +148,13 @@ EOF
 fi
 
 systemctl enable systemd-boot-update.service
+
+# Check if the disk in enqrypted
+if [[ $DISK_ENCRYPT = 'y' ]]; then
+    echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
+else
+    echo "root=/dev/mapper/archvolume-root rw" > /etc/kernel/cmdline
+fi
 
 }
 
@@ -209,48 +237,10 @@ if [[ $PLATFORM == "EFI" ]]; then
     # efi setup funtion (function above of the page)
     efisetup
 
-    # Check if the disk in enqrypted
-    if [[ $DISK_ENCRYPT = 'y' ]]; then
-        echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
-    else
-        echo "root=/dev/mapper/archvolume-root rw" > /etc/kernel/cmdline
-    fi
-
 elif [[ $PLATFORM == "BIOS" ]]; then
     # Bios setup funtion (function above of the page)
     biossetup
-
-    # Detecting other operating systems (This is handy if the user has multiple disks on his bios computer)
-    pacman -S os-prober --needed --noconfirm
-    echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub
-
-    # Disable submenu's good for multiple kernels
-    sed -i 's/^#GRUB_DISABLE_SUBMENU=/GRUB_DISABLE_SUBMENU=/' /etc/default/grub
-
-    # That grub will boot in the same kernel as last boot as default
-    sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub
-    sed -i 's/^#GRUB_SAVEDEFAULT=/GRUB_SAVEDEFAULT=/' /etc/default/grub
-
-    # Check if the disk is encrypted
-    if [[ $DISK_ENCRYPT = 'y' ]]; then
-        # 1. Force enable cryptodisk
-        sed -i 's/^#\?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
-
-        # 2. Append to GRUB_CMDLINE_LINUX_DEFAULT instead of overwriting
-        sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=UUID=${ROOT_UUID}\"|" /etc/default/grub
-    fi
-
-    grub-mkconfig -o /boot/grub/grub.cfg
-fi
-
-echo -ne "
--------------------------------------------------------------------------
-                            mkinitcpio
--------------------------------------------------------------------------
-"
-
-mkinitcpio -P
-
+   fi
 
 
 echo "Finished 1-preinstall.sh"

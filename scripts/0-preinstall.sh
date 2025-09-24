@@ -97,6 +97,7 @@ mount_common_filesystems() {
     swapon /dev/mapper/archvolume-swap
 }
 
+# funtion that formats the disk for a EFI firmware system
 efisetup() {
     calculatelvm
     set_partition_names
@@ -110,16 +111,9 @@ efisetup() {
     mkdir /mnt/efi
     mount ${partition1} /mnt/efi
 
-    # Confirmation step
-    while true; do
-        lsblk
-        read -p "Continue (y): " answer
-        if [[ $answer == "y" || $answer == "Y" ]]; then
-            break
-        fi
-    done
-}
+ }
 
+# funtion that formats the disk for a BIOS firmware system
 biossetup() {
     calculatelvm
     set_partition_names
@@ -128,14 +122,6 @@ biossetup() {
     create_filesystems
     mount_common_filesystems
 
-    # Confirmation step
-      while true; do
-          lsblk
-          read -p "Continue (y): " answer
-          if [[ $answer == "y" || $answer == "Y" ]]; then
-              break
-          fi
-      done
 }
 
 
@@ -321,6 +307,45 @@ echo -ne "
     esac
 fi
 
+gpu_type=$(lspci)
+if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
+    echo ""
+    echo "========================================="
+    echo "        NVIDIA GPU DETECTED"
+    echo "========================================="
+    echo ""
+    lspci | grep -E "VGA|3D|Display"
+    echo ""
+    echo "IMPORTANT: Choose based on your setup:"
+    echo ""
+    echo "• If you have DUAL GRAPHICS (Intel/AMD + NVIDIA):"
+    echo "  → You can SKIP this (select 'n')"
+    echo "  → System will use integrated graphics initially"
+    echo "  → You can install NVIDIA drivers later if needed"
+    echo ""
+    echo "• If you have NVIDIA ONLY:"
+    echo "  → You MUST install drivers (select 'y')"
+    echo "  → Otherwise you may have no display after reboot!"
+    echo ""
+    echo "• If unsure, check your laptop stickers or specs"
+    echo ""
+    while true; do
+        read -p "Install proprietary NVIDIA drivers? (y/n): " nvidia_choice
+
+        if [[ $nvidia_choice == "y" || $nvidia_choice == "Y" ]]; then
+            echo "Setting up NVIDIA proprietary drivers..."
+            nvidia_install=y
+            break
+        elif [[ $nvidia_choice == "n" || $nvidia_choice == "N" ]]; then
+            echo "Skipping NVIDIA drivers (using open-source/integrated graphics)"
+            nvidia_install=n
+            break
+        else
+            echo "Enter a valid input"
+        fi
+    done
+fi
+
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -340,6 +365,31 @@ else
     echo "BIOS firmware detected"
     platform=BIOS
 fi
+
+clear
+echo -ne "
+-------------------------------------------------------------------------
+                        INSTALLATION CONFORMATION
+-------------------------------------------------------------------------
+"
+sleep 1
+echo -ne "
+"Please review your installation configuration:"
+
+Firmware Type:        $platform
+Target Disk:          $DISK
+Disk Encryption:      $(if [[ $disk_encrypt == "y" ]]; then echo "ENABLED (LUKS)"; else echo "DISABLED"; fi)
+Hostname:             $name_of_machine
+Timezone:             $timezone
+Username:             $username
+Root Password:        $root_password
+User Password:        $password
+Installation Type:    $de_choice
+"
+$(if [[ $de_choice == "SERVER" ]]; then
+echo "Server Filesystem:    $server_file"
+fi)
+
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -410,12 +460,46 @@ else
     exit 1
 fi
 
+# If something did not go right you need to be able to rerun the script
+# Confirmation step
+while true; do
+    lsblk
+    read -p "Continue (y/n): " answer
+    if [[ $answer == "y" || $answer == "Y" ]]; then
+        break
+    elif [[ $answer == "n" || $answer == "N" ]]; then
+        echo "Cleaning up and cancelling installation..."
+        # Unmount all mounted filesystems
+        umount -R /mnt 2>/dev/null
+        # Deactivate swap
+        swapoff /dev/mapper/archvolume-swap 2>/dev/null
+        # Remove LVM volumes
+        lvremove -f archvolume/swap 2>/dev/null
+        lvremove -f archvolume/root 2>/dev/null
+        lvremove -f archvolume/home 2>/dev/null
+        # Remove volume group
+        vgremove -f archvolume 2>/dev/null
+        # Remove physical volume
+        pvremove ${LVM_DEVICE} 2>/dev/null
+        # Close encrypted device if it exists
+        if [[ $disk_encrypt == "y" ]]; then
+            cryptsetup close cryptlvm 2>/dev/null
+        fi
+        # Wipe partition table
+        sgdisk -Z ${DISK} 2>/dev/null
+
+        clear
+        echo "========================================="
+        echo "     Installation Cancelled"
+        echo "========================================="
+        echo "Disk has been cleaned up."
+        echo "You can safely rerun the script."
+        sleep 2
+        exit 0
+    fi
+done
+
 # done with disk setup
-
-# als niet goed moet opnieuw kunnen doen
-
-
-
 
 
 # Store variables for later use
@@ -459,6 +543,8 @@ timezone=$timezone
 # DE choice
 de_choice=$de_choice
 
+# GPU GRAPHICS
+nvidia_install=$nvidia_install
 
 EOF
 
