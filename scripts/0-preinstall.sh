@@ -419,6 +419,7 @@ if [[ $platform == "EFI" ]]; then
 elif [[ $platform == "BIOS" ]]; then
     sgdisk -n 1::+1G --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
     sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
+    sgdisk -A 1:set:2 ${DISK}
     partprobe ${DISK}
     biossetup
 else
