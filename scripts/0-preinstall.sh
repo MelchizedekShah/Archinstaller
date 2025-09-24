@@ -348,30 +348,6 @@ else
     platform=BIOS
 fi
 
-clear
-echo -ne "
--------------------------------------------------------------------------
-                        INSTALLATION CONFORMATION
--------------------------------------------------------------------------
-"
-sleep 1
-echo -ne "
-"Please review your installation configuration:"
-
-Firmware Type:        $platform
-Disk Encryption:      $(if [[ $disk_encrypt == "y" ]]; then echo "ENABLED (LUKS)"; else echo "DISABLED"; fi)
-Hostname:             $name_of_machine
-Timezone:             $timezone
-Username:             $username
-Root Password:        $root_password
-User Password:        $password
-Installation Type:    $de_choice
-"
-$(if [[ $de_choice == "SERVER" ]]; then
-echo "Server Filesystem:    $server_file"
-fi)
-
-
 echo -ne "
 -------------------------------------------------------------------------
                     Formatting the disk
@@ -403,6 +379,31 @@ while true; do
         echo "Enter a valid input"
     fi
 done
+
+clear
+echo -ne "
+-------------------------------------------------------------------------
+                        INSTALLATION CONFORMATION
+-------------------------------------------------------------------------
+"
+sleep 1
+echo -ne "
+"Please review your installation configuration:"
+
+Firmware Type:        $platform
+Target Disk:          $DISK
+Disk Encryption:      $(if [[ $disk_encrypt == "y" ]]; then echo "ENABLED (LUKS)"; else echo "DISABLED"; fi)
+Hostname:             $name_of_machine
+Timezone:             $timezone
+Username:             $username
+Root Password:        $root_password
+User Password:        $password
+Installation Type:    $de_choice
+"
+$(if [[ $de_choice == "SERVER" ]]; then
+echo "Server Filesystem:    $server_file"
+fi)
+# end confirmation nex the disk wipe
 
 echo "***********************************************************"
 echo " WARNING: You are about to completely WIPE ${DISK}!"
