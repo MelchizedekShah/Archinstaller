@@ -128,23 +128,6 @@ biossetup() {
     create_filesystems
     mount_common_filesystems
 
-    if [[ $de_choice == "SERVER" ]]; then
-        if [[ $server_file == "XFS" ]]; then
-            mkfs.xfs ${partition1}
-            mkdir /mnt/boot
-            mount ${partition1} /mnt/boot
-        else
-            mkfs.ext4 ${partition1}
-            mkdir /mnt/boot
-            mount ${partition1} /mnt/boot
-        fi
-    else
-        # Setup boot partition with ext4
-        mkfs.ext4 ${partition1}
-        mkdir /mnt/boot
-        mount ${partition1} /mnt/boot
-    fi
-
     # Confirmation step
       while true; do
           lsblk
@@ -417,7 +400,7 @@ if [[ $platform == "EFI" ]]; then
     partprobe ${DISK}
     efisetup
 elif [[ $platform == "BIOS" ]]; then
-    sgdisk -n 1::+1G --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
+    sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
     sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
     sgdisk -A 1:set:2 ${DISK}
     partprobe ${DISK}
@@ -428,6 +411,11 @@ else
 fi
 
 # done with disk setup
+
+# als niet goed moet opnieuw kunnen doen
+
+
+
 
 
 # Store variables for later use
