@@ -37,6 +37,8 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
+# if install nvidia install linux headers
+
 gpu_type=$(lspci)
 if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
     echo "No support yet"
