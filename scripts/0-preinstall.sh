@@ -7,6 +7,8 @@ calculatelvm() {
     DISK_SIZE=$(echo $DISK_SIZE_RAW | sed 's/G//' | awk '{printf "%.0f", $1}')
     if [[ $hibernate == "YES" ]]; then
         SWAP_SIZE=$((RAM_GB * 2))
+    elif [[ $DISK_SIZE < 40 ]]; then
+        SWAP_SIZE=2
     else
         SWAP_SIZE=4
     fi
