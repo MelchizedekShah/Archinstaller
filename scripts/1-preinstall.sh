@@ -19,7 +19,6 @@ mkinitcpio -P
 
 # installing grub
 pacman -S grub os-prober --noconfirm --needed
-grub-install --target=i386-pc ${DISK}
 
 # Setting up grub settings
 
@@ -39,7 +38,7 @@ if [[ $DISK_ENCRYPT = 'y' ]]; then
     # 2. Append to GRUB_CMDLINE_LINUX_DEFAULT instead of overwriting
     sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/mapper/archvolume-root\"|" /etc/default/grub
 fi
-mkinitcpio -P
+grub-install --target=i386-pc ${DISK}
 grub-mkconfig -o /boot/grub/grub.cfg
 }
 
