@@ -129,7 +129,7 @@ biossetup() {
     mount_common_filesystems
 
     # Setup boot partition
-    mkfs.fat -F32 ${partition1}
+    mkfs.ext4 ${partition1}
     mkdir /mnt/boot
     mount ${partition1} /mnt/boot
 
