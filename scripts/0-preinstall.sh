@@ -5,7 +5,11 @@ calculatelvm() {
     RAM_GB=$(free -m | awk '/^Mem:/ {printf "%.0f", $2/1024}')
     DISK_SIZE_RAW=$(lsblk -d -n -o SIZE $DISK)
     DISK_SIZE=$(echo $DISK_SIZE_RAW | sed 's/G//' | awk '{printf "%.0f", $1}')
-    SWAP_SIZE=$((RAM_GB * 2))
+    if [[ $hibernate == "YES" ]]; then
+        SWAP_SIZE=$((RAM_GB * 2))
+    else
+        SWAP_SIZE=4
+    fi
     ROOT_SIZE=$(((DISK_SIZE - SWAP_SIZE) * 40 / 100))
     echo "Swap size: ${SWAP_SIZE}G"
     echo "Root size: ${ROOT_SIZE}G"
@@ -276,6 +280,24 @@ case $de_choice in
 
 esac
 
+echo -ne "
+-------------------------------------------------------------------------
+                           Hibernation
+-------------------------------------------------------------------------
+"
+while true; do
+read -p "Will you hibernate your computer? (y/n)" hibernate
+if [[ $hibernate == "y" || $hibernate == "Y" ]]; then
+    hibernate="YES"
+    break
+elif [[ $hibernate == "n" || $hibernate == "N" ]]; then
+    hibernate="NO"
+    break
+else
+    echo "Enter a vaild input"
+fi
+done
+
 # filesystem choice for server setup
 if [[ $de_choice == "SERVER" ]]; then
 echo -ne "
@@ -404,6 +426,7 @@ Username:             $username
 Root Password:        $(printf '%*s' ${#root_password} '' | tr ' ' '*')
 User Password:        $(printf '%*s' ${#password} '' | tr ' ' '*')
 Installation Type:    $de_choice
+Swap size:            $(if [[ $hibernate == "YES" ]]; then echo "2X RAM size"; else echo "4G"; fi)
 
 "
 $(if [[ $de_choice == "SERVER" ]]; then
@@ -520,6 +543,7 @@ SWAP_SIZE=$SWAP_SIZE
 ROOT_SIZE=$ROOT_SIZE
 partition1=$partition1
 server_file=$server_file
+hibernate=$hibernate
 
 # User & hostname creation
 username=$username
@@ -586,7 +610,7 @@ elif [[ $de_choice == SERVER ]]; then
 fi
 
 while true; do
-    if ! pacstrap -K /mnt ${packages} --noconfirm --needed; then
+    if ! pacstrap -K /mnt --noconfirm --needed ${packages}; then
         echo "ERROR: Package installation failed"
         echo "Try again.."
     else

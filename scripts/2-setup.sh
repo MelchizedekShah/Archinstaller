@@ -86,6 +86,7 @@ case $de_choice in
         pacman -S --noconfirm --needed xfce4 xfce4-goodies sddm
         systemctl enable sddm
         echo "XFCE installed successfully!"
+        ;;
     *)
         echo "Server or minimum setup"
         echo "Not installing DE"
