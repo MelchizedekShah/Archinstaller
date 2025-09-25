@@ -236,15 +236,16 @@ echo -ne "
 echo "Please select a option:"
 echo "1) KDE Plasma"
 echo "2) GNOME"
-echo "3) Server"
-echo "4) Minimal"
+echo "3) XFCE"
+echo "4) Server"
+echo "5) Minimal"
 echo ""
 echo "Default is KDE (press Enter for default)"
 read -p "Enter your choice [1-4]: " de_choice
 
 # Set default if empty
 if [[ -z "$de_choice" ]]; then
-    de_choice=1
+    de_choice=5
 fi
 
 case $de_choice in
@@ -257,10 +258,14 @@ case $de_choice in
         de_choice=GNOME
         ;;
     3)
+        echo "XFCE setup"
+        de_choice=XFCE
+        ;;
+    4)
         echo "Server setup"
         de_choice=SERVER
         ;;
-    4)
+    5)
         echo "Minimal setup"
         de_choice=MIN
         ;;

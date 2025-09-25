@@ -81,6 +81,11 @@ case $de_choice in
          systemctl enable gdm
          echo "GNOME installed successfully!"
          ;;
+    XFCE)
+        echo "Installing XFCE..."
+        pacman -S --noconfirm --needed xfce4 xfce4-goodies sddm
+        systemctl enable sddm
+        echo "XFCE installed successfully!"
     *)
         echo "Server or minimum setup"
         echo "Not installing DE"
