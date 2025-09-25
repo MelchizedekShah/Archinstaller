@@ -14,6 +14,9 @@ else
     sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 fi
 
+# generate
+mkinitcpio -P
+
 # installing grub
 pacman -S grub os-prober --noconfirm --needed
 grub-install --target=i386-pc ${DISK}
@@ -34,7 +37,7 @@ if [[ $DISK_ENCRYPT = 'y' ]]; then
     sed -i 's/^#\?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
 
     # 2. Append to GRUB_CMDLINE_LINUX_DEFAULT instead of overwriting
-    sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root\"|" /etc/default/grub
+    sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/mapper/archvolume-root\"|" /etc/default/grub
 fi
 
 grub-mkconfig -o /boot/grub/grub.cfg
