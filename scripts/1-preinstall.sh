@@ -14,44 +14,6 @@ else
     sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 fi
 
-
-# .preset files
-if [[ $de_choice != "SERVER" ]]; then
-cat > /etc/mkinitcpio.d/linux.preset <<'EOF'
-# mkinitcpio preset file for the 'linux' package
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux"
-
-PRESETS=('default')
-
-default_image="/boot/initramfs-linux.img"
-EOF
-
-cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
-# mkinitcpio preset file for the 'linux-lts' package
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux-lts"
-
-PRESETS=('default')
-
-default_image="/boot/initramfs-linux-lts.img"
-EOF
-
-# servers .preset files (only lts kernel)
-else
-cat > /etc/mkinitcpio.d/linux-lts.preset <<'EOF'
-ALL_config="/etc/mkinitcpio.conf"
-ALL_kver="/boot/vmlinuz-linux-lts"
-
-PRESETS=('default' 'fallback')
-
-default_image="/boot/initramfs-linux-lts.img"
-
-fallback_image="/boot/initramfs-linux-lts-fallback.img"
-fallback_options="-S autodetect"
-EOF
-fi
-mkinitcpio -P
 # installing grub
 pacman -S grub os-prober --noconfirm --needed
 grub-install --target=i386-pc ${DISK}
