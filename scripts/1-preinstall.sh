@@ -26,9 +26,7 @@ echo 'GRUB_DISABLE_OS_PROBER=false' >> /etc/default/grub
 # Disable submenu's good for multiple kernels
 sed -i 's/^#GRUB_DISABLE_SUBMENU=/GRUB_DISABLE_SUBMENU=/' /etc/default/grub
 
-# That grub will boot in the same kernel as last boot as default
-sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub
-sed -i 's/^#GRUB_SAVEDEFAULT=/GRUB_SAVEDEFAULT=/' /etc/default/grub
+sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=3/' /etc/default/grub
 
 # Check if the disk is encrypted
 if [[ $DISK_ENCRYPT = 'y' ]]; then
