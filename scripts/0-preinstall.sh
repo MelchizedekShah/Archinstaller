@@ -428,7 +428,7 @@ Username:             $username
 Root Password:        $(printf '%*s' ${#root_password} '' | tr ' ' '*')
 User Password:        $(printf '%*s' ${#password} '' | tr ' ' '*')
 Installation Type:    $de_choice
-Swap size:            $(if [[ $hibernate == "YES" ]]; then echo "2X RAM size"; else echo "4G"; fi)
+Swap size:            $(if [[ $hibernate == "YES" ]]; then echo "2X RAM size"; else echo "2-4G"; fi)
 
 "
 $(if [[ $de_choice == "SERVER" ]]; then
