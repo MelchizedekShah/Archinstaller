@@ -204,6 +204,6 @@ elif [[ $PLATFORM == "BIOS" ]]; then
     # Bios setup funtion (function above of the page)
     biossetup
    fi
-
+fi
 
 echo "Finished 1-preinstall.sh"
