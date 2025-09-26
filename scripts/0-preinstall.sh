@@ -439,6 +439,7 @@ if [[ $disk_encrypt == "y" ]]; then
             echo "LUKS passwords do not match. Try again."
         fi
     done
+fi
 
 clear
 echo -ne "
