@@ -39,8 +39,8 @@ if [[ $DISK_ENCRYPT = 'y' ]]; then
     sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root %g" /etc/default/grub
 
 fi
-grub-install --target=i386-pc ${DISK}
 grub-mkconfig -o /boot/grub/grub.cfg
+grub-install --target=i386-pc ${DISK}
 }
 
 # efi setup function
