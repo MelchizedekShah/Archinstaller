@@ -129,9 +129,9 @@ biossetup() {
     mount_common_filesystems
 
     # Setup boot partition
-    mkfs.ext4 ${partition1}
-    mkdir /mnt/boot
-    mount ${partition1} /mnt/boot
+   # mkfs.ext4 ${partition1}
+   # mkdir /mnt/boot
+   # mount ${partition1} /mnt/boot
 
 }
 
@@ -468,7 +468,7 @@ if [[ $platform == "EFI" ]]; then
     partprobe ${DISK}
     efisetup
 elif [[ $platform == "BIOS" ]]; then
-    sgdisk -n 1::+1G --typecode=1:8300 --change-name=1:'BIOSBOOT' ${DISK}
+    sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
     sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
     sgdisk -A 1:set:2 ${DISK}
     partprobe ${DISK}
