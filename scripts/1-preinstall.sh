@@ -36,7 +36,7 @@ if [[ $DISK_ENCRYPT = 'y' ]]; then
     sed -i 's/^#\?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
 
     # 2. Append to GRUB_CMDLINE_LINUX_DEFAULT instead of overwriting
-    sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${LUKS_UUID}:ROOT root=/dev/archvolume/root %g" /etc/default/grub
+    sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${LUKS_UUID}:cryptlvm root=/dev/archvolume/root %g" /etc/default/grub
 
 fi
 grub-install --target=i386-pc ${DISK}
