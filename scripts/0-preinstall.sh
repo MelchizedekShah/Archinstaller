@@ -633,13 +633,18 @@ echo -ne "
 "
 
 if [[ $de_choice != SERVER ]]; then
-    packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
+    packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo"
 elif [[ $de_choice == SERVER ]]; then
     if [[ $server_file == "XFS" ]]; then
-        packages="xfsprogs base base-devel bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
+        packages="xfsprogs base bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo"
     else
-        packages="base base-devel bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo git"
+        packages="base bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo"
     fi
+fi
+
+# Add EFI boot manager if needed
+if [[ $platform == "EFI" ]]; then
+    packages+=" efibootmgr"
 fi
 
 while true; do
