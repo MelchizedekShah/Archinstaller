@@ -83,7 +83,12 @@ case $de_choice in
          ;;
     XFCE)
         echo "Installing XFCE..."
-        pacman -S --noconfirm --needed xfce4 xfce4-goodies sddm
+        xfce_packages="xfce4 xfce4-goodies xorg \
+        pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
+        xfce4-pulseaudio-plugin pavucontrol \
+        gst-plugin-pipewire alsa-utils network-manager-applet"
+
+        pacman -S --noconfirm --needed ${xfce_packages}
         systemctl enable sddm
         echo "XFCE installed successfully!"
         ;;
