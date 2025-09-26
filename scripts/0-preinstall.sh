@@ -33,7 +33,7 @@ setup_encryption() {
         echo "Setting up LUKS encryption..."
         # Loop for encryption setup with error handling
         while true; do
-            if cryptsetup luksFormat ${partition2}; then
+            if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${partition2} -; then
                 break
             else
                 echo "Encryption setup failed. Retrying..."
@@ -42,7 +42,7 @@ setup_encryption() {
         done
 
         while true; do
-            if cryptsetup open ${partition2} cryptlvm; then
+            if echo -n "${luks_password}" | cryptsetup open ${partition2} cryptlvm -; then
                 break
             else
                 echo "Failed to open encrypted partition. Retrying..."
@@ -401,6 +401,12 @@ while true; do
     fi
 done
 
+echo -ne "
+-------------------------------------------------------------------------
+                          LUKS Setup
+-------------------------------------------------------------------------
+"
+
 while true; do
     read -p "Do you want to encrypt your system? (y/n): " ENCRYPT
     if [[ $ENCRYPT == "y" || $ENCRYPT == "Y" ]]; then
@@ -413,6 +419,26 @@ while true; do
         echo "Enter a valid input"
     fi
 done
+
+if [[ $disk_encrypt == "y" ]]; then
+
+    # Set a luks password
+    while true; do
+        read -s -p "Please enter LUKS password: " luks_password
+        echo ""
+        if [[ $luks_password < 2 ]]; then
+            continue
+        fi
+        read -s -p "Confirm password: " password_confirm
+        if [[ "$luks_password" == "$password_confirm" ]]; then
+            echo ""
+            echo "LUKS password setup success"
+            break
+        else
+            echo ""
+            echo "LUKS passwords do not match. Try again."
+        fi
+    done
 
 clear
 echo -ne "
