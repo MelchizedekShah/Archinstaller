@@ -129,9 +129,9 @@ biossetup() {
     mount_common_filesystems
 
     # Setup boot partition
-    #mkfs.ext4 ${partition1}
-    #mkdir /mnt/boot
-    #mount ${partition1} /mnt/boot
+    mkfs.ext4 ${partition1}
+    mkdir /mnt/boot
+    mount ${partition1} /mnt/boot
 
 }
 
@@ -495,8 +495,9 @@ if [[ $platform == "EFI" ]]; then
     partprobe ${DISK}
     efisetup
 elif [[ $platform == "BIOS" ]]; then
-    sgdisk -n 1::+2M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK}
-    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
+    sgdisk -n 1::+1G --typecode=1:8300 --change-name=1:'BOOT' ${DISK} # partition1
+    sgdisk -n 2::+2M --typecode=2:ef02 --change-name=2:'BIOSBOOT' ${DISK}
+    sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
     sgdisk -A 1:set:2 ${DISK}
     partprobe ${DISK}
     biossetup
@@ -558,9 +559,16 @@ echo -ne "
 if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
     partition1=${DISK}p1
     partition2=${DISK}p2
+    if [[ $platform == "BIOS" ]]; then
+        partition3=${DISK}p3
+    fi
+
 else
     partition1=${DISK}1
     partition2=${DISK}2
+    if [[ $platform == "BIOS" ]]; then
+        partition3=${DISK}3
+    fi
 fi
 
 # Create vars.sh file
@@ -596,7 +604,11 @@ EOF
 
 # Store UUIDs based on setup
 if [[ $disk_encrypt == "y" ]]; then
-    LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+    if [[ $platform == "BIOS" ]]; then
+        LUKS_UUID=$(blkid -s UUID -o value "$partition3")
+    else
+        LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+    fi
     ROOT_UUID=$(blkid -s UUID -o value /dev/mapper/archvolume-root)
     echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
     echo "ROOT_UUID=$ROOT_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
