@@ -33,8 +33,13 @@ setup_encryption() {
         echo "Setting up LUKS encryption..."
         # Loop for encryption setup with error handling
         while true; do
-            if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${partition2} -; then
+            if [[ $platform == "BIOS" ]]; then
+                if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${partition3} -; then
                 break
+                fi
+            else
+                if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${partition2} -; then
+                fi
             else
                 echo "Encryption setup failed. Retrying..."
                 read -p "Press Enter to retry or Ctrl+C to exit..."
