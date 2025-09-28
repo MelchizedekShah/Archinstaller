@@ -31,23 +31,26 @@ set_partition_names() {
 setup_encryption() {
     if [[ $disk_encrypt == "y" ]]; then
         echo "Setting up LUKS encryption..."
-        # Loop for encryption setup with error handling
+
+        #  which partition to encrypt based on platform
+        if [[ $platform == "BIOS" ]]; then
+            ENCRYPT_PARTITION=${partition3}
+        else
+            ENCRYPT_PARTITION=${partition2}
+        fi
+
         while true; do
-            if [[ $platform == "BIOS" ]]; then
-                if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${partition3} -; then
+            if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${ENCRYPT_PARTITION} -; then
                 break
-                fi
-            else
-                if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${partition2} -; then
-                fi
             else
                 echo "Encryption setup failed. Retrying..."
                 read -p "Press Enter to retry or Ctrl+C to exit..."
             fi
         done
 
+        # Open the encrypted partition
         while true; do
-            if echo -n "${luks_password}" | cryptsetup open ${partition2} cryptlvm -; then
+            if echo -n "${luks_password}" | cryptsetup open ${ENCRYPT_PARTITION} cryptlvm -; then
                 break
             else
                 echo "Failed to open encrypted partition. Retrying..."
@@ -58,7 +61,12 @@ setup_encryption() {
         LVM_DEVICE="/dev/mapper/cryptlvm"
     else
         echo "Setting up without encryption..."
-        LVM_DEVICE="${partition2}"
+        # Set LVM device based on platform
+        if [[ $platform == "BIOS" ]]; then
+            LVM_DEVICE="${partition3}"
+        else
+            LVM_DEVICE="${partition2}"
+        fi
     fi
 }
 
