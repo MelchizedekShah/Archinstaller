@@ -18,14 +18,22 @@ calculatelvm() {
 }
 
 set_partition_names() {
-    # Set partition names based on disk type
+    # Set partition names again for UUID collection and for bios partition collection
     if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
         partition1=${DISK}p1
         partition2=${DISK}p2
+        if [[ $platform == "BIOS" ]]; then
+            partition3=${DISK}p3
+        fi
+
     else
         partition1=${DISK}1
         partition2=${DISK}2
+        if [[ $platform == "BIOS" ]]; then
+            partition3=${DISK}3
+        fi
     fi
+
 }
 
 setup_encryption() {
