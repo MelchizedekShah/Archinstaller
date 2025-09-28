@@ -13,7 +13,7 @@ echo -ne "
 if [[ $de_choice == "XFCE" ]]; then
     echo "XFCE setup..."
     sudo pacman -S --needed --noconfirm xorg-xinit
-    echo "exec startxfce4" > /home/${username}.xinitrc
+    echo "exec startxfce4" > /home/${username}/.xinitrc
 
 
     #customizations
