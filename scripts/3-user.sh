@@ -13,10 +13,22 @@ echo -ne "
 if [[ $de_choice == "XFCE" ]]; then
     echo "XFCE setup..."
     sudo pacman -S --needed --noconfirm xorg-xinit
-    echo "exec startxfce4" > /home/${username}/.xinitrc
 
+    # edit the xinitrc file
+    cat > /home/${username}/.xinitrc << "EOF"
+    #!/bin/bash
+    exec startxfce4
+    EOF
+    chmod +x /home/${username}/.xinitrc
 
-    #customizations
+    # edit the bash profile file
+    if ! grep -q "exec startx" /home/${username}/.bash_profile 2>/dev/null; then    
+    cat >> /home/${username}/.bash_profile << "EOF"
+    if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then
+        exec startx
+    fi
+    EOF
+
 fi
 
 
