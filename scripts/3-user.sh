@@ -22,13 +22,13 @@ if [[ $de_choice == "XFCE" ]]; then
     chmod +x /home/${username}/.xinitrc
 
     # edit the bash profile file
-    if ! grep -q "exec startx" /home/${username}/.bash_profile 2>/dev/null; then    
+    if ! grep -q "exec startx" /home/${username}/.bash_profile 2>/dev/null; then
     cat >> /home/${username}/.bash_profile << "EOF"
     if [[ -z $DISPLAY ]] && [[ $(tty) == /dev/tty1 ]]; then
         exec startx
     fi
     EOF
-
+    fi
 fi
 
 
