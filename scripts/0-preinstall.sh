@@ -705,11 +705,14 @@ echo -ne "
 genfstab -U /mnt >> /mnt/etc/fstab
 
 if [[ $platform == "EFI" ]]; then
-    echo "Fixing EFI mount options in fstab..."
+    echo "Fixing EFI mount boot options in fstab..."
     sed -i '/\/efi/ s/fmask=[0-9]\{4\}/fmask=0137/; s/dmask=[0-9]\{4\}/dmask=0027/' /mnt/etc/fstab
-else
-    echo "Check bios fstab... still in development"
-fi
 
+elif [[ $platform == "BIOS" ]]; then
+    echo "Fixing BIOS mount boot options in fstab..."
+    sed -i '/\/boot/ s/fmask=[0-9]\{4\}/fmask=0137/; s/dmask=[0-9]\{4\}/dmask=0027/' /mnt/etc/fstab
+else
+    echo "error.. no valid platform"
+fi
 
 echo "Finished 0-preinstall.sh"
