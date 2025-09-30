@@ -426,7 +426,7 @@ cat > scripts/vars.sh << EOF
 
 # Disk & system information
 DISK=$DISK
-PLATFORM=$platform
+platform=$platform
 DISK_ENCRYPT=$disk_encrypt
 RAM_GB=$RAM_GB
 SWAP_SIZE=$SWAP_SIZE
