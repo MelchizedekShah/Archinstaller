@@ -23,6 +23,7 @@ echo -ne "
 
 sleep 1
 
+( bash $SCRIPTS_DIR/setup.sh )|& tee setup.log
 ( bash $SCRIPTS_DIR/0-preinstall.sh )|& tee 0-preinstall.log
 
 mkdir -p /mnt/usr/local/share/Archinstaller
