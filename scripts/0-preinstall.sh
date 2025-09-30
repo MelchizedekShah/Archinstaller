@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source setup.sh
+source vars.sh
 
 calculatelvm() {
     # Calculating sizes for lvm
@@ -226,6 +226,19 @@ while true; do
 done
 
 # done with disk setup
+
+# Store UUIDs based on setup
+if [[ $disk_encrypt == "y" ]]; then
+    if [[ $platform == "BIOS" ]]; then
+        LUKS_UUID=$(blkid -s UUID -o value "$partition3")
+    else
+        LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+    fi
+    echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
+    echo "Stored LUKS UUID: $LUKS_UUID"
+fi
+
+echo "UUID saved to /mnt/usr/local/share/Archinstaller/vars.sh"
 
 echo -ne "
 -------------------------------------------------------------------------

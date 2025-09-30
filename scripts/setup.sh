@@ -37,6 +37,7 @@ while true; do
             fi
     done
     if [[ $found_key == y ]]; then
+        echo ""
         echo "Your selected keyboard layout: ${key_layout}"
         break
     else
@@ -420,9 +421,7 @@ else
     fi
 fi
 
-# Create vars.sh file
-mkdir -p /mnt/usr/local/share/Archinstaller
-cat > /mnt/usr/local/share/Archinstaller/vars.sh << EOF
+cat > vars.sh << EOF
 # Archinstaller configuration variables
 
 # Disk & system information
@@ -451,18 +450,6 @@ nvidia_install=$nvidia_install
 
 EOF
 
-# Store UUIDs based on setup
-if [[ $disk_encrypt == "y" ]]; then
-    if [[ $platform == "BIOS" ]]; then
-        LUKS_UUID=$(blkid -s UUID -o value "$partition3")
-    else
-        LUKS_UUID=$(blkid -s UUID -o value "$partition2")
-    fi
-    ROOT_UUID=$(blkid -s UUID -o value /dev/mapper/archvolume-root)
-    echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
-    echo "ROOT_UUID=$ROOT_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
-    echo "Stored LUKS UUID: $LUKS_UUID"
-    echo "Stored ROOT UUID: $ROOT_UUID"
-fi
 
-echo "Configuration saved to /mnt/usr/local/share/Archinstaller/vars.sh"
+
+# moet in 0 gaan
