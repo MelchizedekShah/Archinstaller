@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source vars.sh
+source scripts/vars.sh
 
 calculatelvm() {
     # Calculating sizes for lvm
