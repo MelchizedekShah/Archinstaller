@@ -421,7 +421,7 @@ else
     fi
 fi
 
-cat > vars.sh << EOF
+cat > scripts/vars.sh << EOF
 # Archinstaller configuration variables
 
 # Disk & system information
