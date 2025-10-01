@@ -428,9 +428,6 @@ cat > scripts/vars.sh << EOF
 DISK=$DISK
 platform=$platform
 DISK_ENCRYPT=$disk_encrypt
-RAM_GB=$RAM_GB
-SWAP_SIZE=$SWAP_SIZE
-ROOT_SIZE=$ROOT_SIZE
 partition1=$partition1
 server_file=$server_file
 hibernate=$hibernate
