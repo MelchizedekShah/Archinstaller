@@ -21,7 +21,7 @@ installpackage() {
 biossetup() {
 
 # mkinitcpio
-if [[ $DISK_ENCRYPT = 'y' ]]; then
+if [[ $disk_encrypt = 'y' ]]; then
     pacman -S cryptsetup --noconfirm --needed
     sed -i 's/^HOOKS=(.*)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 else
@@ -45,7 +45,7 @@ sed -i 's/^#GRUB_DISABLE_SUBMENU=/GRUB_DISABLE_SUBMENU=/' /etc/default/grub
 sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=2/' /etc/default/grub
 
 # Check if the disk is encrypted
-if [[ $DISK_ENCRYPT = 'y' ]]; then
+if [[ $disk_encrypt = 'y' ]]; then
     # 1. Force enable cryptodisk
     sed -i 's/^#\?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
 
@@ -61,7 +61,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 efisetup() {
 
 # mkinitcpio setup
-if [[ $DISK_ENCRYPT = 'y' ]]; then
+if [[ $disk_encrypt = 'y' ]]; then
     pacman -S cryptsetup --noconfirm --needed
     sed -i 's/^HOOKS=(.*)/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 else
@@ -127,7 +127,7 @@ fi
 systemctl enable systemd-boot-update.service
 
 # Check if the disk in enqrypted
-if [[ $DISK_ENCRYPT = 'y' ]]; then
+if [[ $disk_encrypt = 'y' ]]; then
     echo "rd.luks.name=${LUKS_UUID}=cryptlvm root=/dev/archvolume/root rw" > /etc/kernel/cmdline
 else
     echo "root=/dev/mapper/archvolume-root rw" > /etc/kernel/cmdline

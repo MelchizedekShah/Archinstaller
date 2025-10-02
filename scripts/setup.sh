@@ -364,7 +364,7 @@ echo -ne "
 "
 sleep 1
 echo -ne "
-"Please review your installation configuration:"
+Please review your installation configuration:
 
 Firmware Type:        $platform
 Target Disk:          $DISK
@@ -436,6 +436,7 @@ hibernate=$hibernate
 username=$username
 root_password=$root_password
 password=$password
+luks_password=$luks_password
 name_of_machine=$name_of_machine
 timezone=$timezone
 
