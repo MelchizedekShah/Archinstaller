@@ -2,6 +2,7 @@
 
 # funtion with all the variables that are handed over from 0-preinstall.sh
 source /usr/local/share/Archinstaller/vars.sh
+source scripts/config.sh
 
 # bios setup function
 biossetup() {
@@ -170,13 +171,19 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 
-sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+#sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+sed -i "s/^#${localization}/${localization}/" /etc/locale.gen
+
 locale-gen
-echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+
+language=$(echo "$localization" | awk '{print $1}')
+
+echo "LANG=$language" > /etc/locale.conf
+
 
 # installing tty font package
 pacman -S terminus-font --noconfirm --needed
-echo "KEYMAP=us" >> /etc/vconsole.conf && echo "FONT=ter-132b" >> /etc/vconsole.conf
+echo "KEYMAP=us" > /etc/vconsole.conf && echo "FONT=ter-132b" >> /etc/vconsole.conf
 
 
 echo -ne "

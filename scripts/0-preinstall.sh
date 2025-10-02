@@ -227,6 +227,10 @@ done
 
 # done with disk setup
 
+mkdir -p /mnt/usr/local/share/Archinstaller
+cp -r "$SCRIPT_DIR"/* /mnt/usr/local/share/Archinstaller/
+chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
+
 # Store UUIDs based on setup
 if [[ $disk_encrypt == "y" ]]; then
     if [[ $platform == "BIOS" ]]; then

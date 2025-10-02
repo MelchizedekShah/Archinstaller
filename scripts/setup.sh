@@ -427,7 +427,7 @@ cat > scripts/vars.sh << EOF
 # Disk & system information
 DISK=$DISK
 platform=$platform
-DISK_ENCRYPT=$disk_encrypt
+disk_encrypt=$disk_encrypt
 partition1=$partition1
 server_file=$server_file
 hibernate=$hibernate

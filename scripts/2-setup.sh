@@ -4,6 +4,18 @@
 source /usr/local/share/Archinstaller/vars.sh
 
 
+installpackage() {
+    while true; do
+        if ! pacman -S --noconfirm --needed ${packages}; then
+            echo "ERROR: Package installation failed"
+            echo "Try again.."
+        else
+            echo "Succes"
+            break
+        fi
+    done
+}
+
 echo -ne "
 -------------------------------------------------------------------------
                         pacman configuration
@@ -71,24 +83,26 @@ echo -ne "
 case $de_choice in
     KDE)
         echo "Installing KDE Plasma..."
-        pacman -S --noconfirm --needed plasma-meta sddm
+        packages="plasma-meta sddm"
+        installpackage
         systemctl enable sddm
         echo "KDE Plasma installed successfully!"
         ;;
     GNOME)
          echo "Installing GNOME..."
-         pacman -S --noconfirm --needed gnome gdm
+         packages="gnome gdm"
+         installpackage
          systemctl enable gdm
          echo "GNOME installed successfully!"
          ;;
     XFCE)
         echo "Installing XFCE..."
-        xfce_packages="xfce4 xfce4-goodies xorg \
+        packages="xfce4 xfce4-goodies xorg \
         pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber \
         xfce4-pulseaudio-plugin pavucontrol \
         gst-plugin-pipewire alsa-utils network-manager-applet"
 
-        pacman -S --noconfirm --needed ${xfce_packages}
+        installpackage
         systemctl enable sddm
         echo "XFCE installed successfully!"
         ;;
@@ -98,6 +112,10 @@ case $de_choice in
         ;;
 
     esac
+
+
+
+
 
 
 echo "Finished 2-setup.sh"
