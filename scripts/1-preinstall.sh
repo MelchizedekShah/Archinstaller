@@ -216,11 +216,11 @@ echo -ne "
  Configure mkinitcpio & Configure the kernel cmdline & .preset file & Installing the bootloader
 ------------------------------------------------------------------------------------------------
 "
-if [[ $PLATFORM == "EFI" ]]; then
+if [[ $platform == "EFI" ]]; then
     # efi setup funtion (function above of the page)
     efisetup
 
-elif [[ $PLATFORM == "BIOS" ]]; then
+elif [[ $platform == "BIOS" ]]; then
     # Bios setup funtion (function above of the page)
     biossetup
 fi
