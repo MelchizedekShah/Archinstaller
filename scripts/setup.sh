@@ -124,7 +124,7 @@ echo -ne "
 
 timezone="$(curl --fail https://ipapi.co/timezone)"
 
-read -p "Is this your timezone? ${timezone} (y/n)" anwser
+read -p "Is this your timezone? ${timezone} (y/n) " anwser
 while true; do
     if [[ $anwser == "y" || $anwser == "Y" ]]; then
         break
