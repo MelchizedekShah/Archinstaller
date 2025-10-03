@@ -238,7 +238,7 @@ if [[ $disk_encrypt == "y" ]]; then
     else
         LUKS_UUID=$(blkid -s UUID -o value "$partition2")
     fi
-    echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/vars.sh
+    echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/scripts/vars.sh
     echo "Stored LUKS UUID: $LUKS_UUID"
 fi
 
