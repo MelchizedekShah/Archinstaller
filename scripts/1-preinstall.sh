@@ -2,7 +2,8 @@
 
 # funtion with all the variables that are handed over from 0-preinstall.sh
 source /usr/local/share/Archinstaller/vars.sh
-source scripts/config.sh
+source /usr/local/share/Archinstaller/scripts/config.sh
+
 
 installpackage() {
     local pkgs="$@"
