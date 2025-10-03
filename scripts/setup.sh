@@ -121,38 +121,56 @@ echo -ne "
                         Chose your timezone
 -------------------------------------------------------------------------
 "
+
+timezone="$(curl --fail https://ipapi.co/timezone)"
+
+read -p "Is this your timezone? ${timezone} (y/n)" anwser
+while true; do
+    if [[ $anwser == "y" || $anwser == "Y" ]]; then
+        break
+    elif [[ $anwser == "n" || $anwser == "N" ]]; then
+        break
+    else
+        echo "Enter a valid input"
+    fi
+done
+
+if [[ $anwser == "n" || $anwser == "N" ]]; then
+
 echo "Available regions:"
 ls /usr/share/zoneinfo/ | tr '\n' ' ' | sort
 echo ""
 
-while true; do
-    read -p "Enter your region (e.g., America, Europe, Asia): " region
+    while true; do
+        read -p "Enter your region (e.g., America, Europe, Asia): " region
+        echo ""
+        if [[ $region < 2 ]]; then
+            continue
+        fi
+        if [[ -d "/usr/share/zoneinfo/$region" ]]; then
+            break
+        else
+            echo "Invalid region. Please try again."
+        fi
+        done
+
     echo ""
-    if [[ $region < 2 ]]; then
-        continue
-    fi
-    if [[ -d "/usr/share/zoneinfo/$region" ]]; then
-        break
-    else
-        echo "Invalid region. Please try again."
-    fi
-done
+    echo "Available cities/zones in $region:"
+    ls "/usr/share/zoneinfo/$region" | tr '\n' ' ' | sort
+    echo ""
 
-echo ""
-echo "Available cities/zones in $region:"
-ls "/usr/share/zoneinfo/$region" | tr '\n' ' ' | sort
-echo ""
+    while true; do
+        read -p "Enter your city/zone (e.g., New_York, London, Tokyo): " city
+        if [[ -f "/usr/share/zoneinfo/$region/$city" ]]; then
+            timezone="$region/$city"
+            break
+        else
+            echo "Invalid city/zone. Please try again."
+        fi
+        done
+        echo "Timezone selected: $timezone"
+fi
 
-while true; do
-    read -p "Enter your city/zone (e.g., New_York, London, Tokyo): " city
-    if [[ -f "/usr/share/zoneinfo/$region/$city" ]]; then
-        timezone="$region/$city"
-        break
-    else
-        echo "Invalid city/zone. Please try again."
-    fi
-done
-echo "Timezone selected: $timezone"
 
 echo -ne "
 -------------------------------------------------------------------------
