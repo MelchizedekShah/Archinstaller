@@ -457,6 +457,7 @@ password=$password
 luks_password=$luks_password
 name_of_machine=$name_of_machine
 timezone=$timezone
+key_layout=$key_layout
 
 # DE choice
 de_choice=$de_choice

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /usr/local/share/Archinstaller/vars.sh
+source /usr/local/share/Archinstaller/scripts/vars.sh
 
 installpackage() {
     local pkgs="$@"
