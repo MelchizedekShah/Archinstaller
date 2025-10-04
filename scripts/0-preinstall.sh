@@ -231,6 +231,8 @@ mkdir -p /mnt/usr/local/share/Archinstaller
 cp -r "$SCRIPT_DIR"/* /mnt/usr/local/share/Archinstaller/
 chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 
+
+
 # Store UUIDs based on setup
 if [[ $disk_encrypt == "y" ]]; then
     if [[ $platform == "BIOS" ]]; then
@@ -242,7 +244,7 @@ if [[ $disk_encrypt == "y" ]]; then
     echo "Stored LUKS UUID: $LUKS_UUID"
 fi
 
-echo "UUID saved to /mnt/usr/local/share/Archinstaller/vars.sh"
+echo "UUID saved to /mnt/usr/local/share/Archinstaller/scripts/vars.sh"
 
 echo -ne "
 -------------------------------------------------------------------------
