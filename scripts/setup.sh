@@ -70,7 +70,7 @@ echo ""
 while true; do
     read -s -p "Please enter user password: " password
     echo ""
-    if [[ $password < 2 ]]; then
+    if (( ${#password} < 2 )); then
         continue
     fi
     read -s -p "Confirm password: " password_confirm
@@ -90,7 +90,7 @@ echo ""
 while true; do
     read -s -p "Please enter root password: " root_password
     echo ""
-    if [[ $root_password < 2 ]]; then
+    if (( ${#password} < 2 )); then
            continue
     fi
     read -s -p "Confirm password: " password_confirm
@@ -359,7 +359,8 @@ if [[ $disk_encrypt == "y" ]]; then
     while true; do
         read -s -p "Please enter LUKS password: " luks_password
         echo ""
-        if [[ $luks_password < 2 ]]; then
+
+        if (( ${#password} < 2 )); then
             continue
         fi
         read -s -p "Confirm password: " password_confirm
