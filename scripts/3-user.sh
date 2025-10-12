@@ -4,6 +4,19 @@
 source /usr/local/share/Archinstaller/scripts/vars.sh
 
 
+installpackage() {
+    local pkgs="$@"
+    while true; do
+        if ! pacman -S --noconfirm --needed $pkgs; then
+            echo "ERROR: Failed to install: $pkgs"
+            echo "Retrying..."
+        else
+            echo "SUCCESS: Installed $pkgs"
+            break
+        fi
+    done
+}
+
 echo -ne "
 -------------------------------------------------------------------------
                         Desktop customizations
@@ -12,7 +25,6 @@ echo -ne "
 
 if [[ $de_choice == "XFCE" ]]; then
     echo "XFCE setup..."
-    sudo pacman -S --needed --noconfirm xorg-xinit
 
     # overwrite the xinitrc file
     cat > /home/${username}/.xinitrc << EOF
@@ -32,6 +44,10 @@ EOF
 fi
 
 
+if [[ $de_choice == "KDE" ]]; then
+    installpackage flatpak-kcm plasma-meta dolphin konsole kwalletmanager filelight \
+        kdeconnect partitionmanager flatpak-kcm papirus-icon-theme
+fi
 echo -ne "
 -------------------------------------------------------------------------
                             Networking

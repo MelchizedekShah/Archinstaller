@@ -273,7 +273,7 @@ echo -ne "
 "
 
 if [[ $de_choice != SERVER ]]; then
-    packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo"
+    packages="base base-devel bash linux linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo flatpak"
 elif [[ $de_choice == SERVER ]]; then
     if [[ $server_file == "XFS" ]]; then
         packages="xfsprogs base bash linux-firmware linux-lts gdisk lvm2 networkmanager vim man-db man-pages texinfo"
