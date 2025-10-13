@@ -2,14 +2,6 @@
 
 source scripts/vars.sh
 
-
-fetchpartition_1() {
-    lsblk -lnpo NAME ${DISK} | tail -n2 | head -n1
-}
-fetchpartition_2() {
-    lsblk -lnpo NAME ${DISK} | tail -n1
-}
-
 installcleanup() {
 echo "Cleaning up and cancelling installation..."
             # Unmount all mounted filesystems
@@ -85,8 +77,8 @@ set_partition_names() {
     #    fi
     #fi
 
-    partition1=fetchpartition_1
-    partition2=fetchpartition_2
+    partition1=$(lsblk -lnpo NAME "${DISK}" | tail -n2 | head -n1 )
+    partition2=$(lsblk -lnpo NAME "${DISK}" | tail -n1 )
 
 }
 
