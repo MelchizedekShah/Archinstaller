@@ -340,9 +340,11 @@ if [[ $platform == "EFI" ]]; then
     while true; do
         read -p "Are you dual booting with Windows? (y/n): " dualboot
         if [[ $dualboot == "y" || $dualboot == "Y" ]]; then
-            $dualboot="y"
+            dualboot="y"
+            break
         elif [[ $dualboot == "n" || $dualboot == "N" ]]; then
-            $dualboot="n"
+            dualboot="n"
+            break
         else
             echo "Enter a valid option"
         fi

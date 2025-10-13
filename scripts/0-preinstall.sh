@@ -3,6 +3,13 @@
 source scripts/vars.sh
 
 
+fetchpartition_1() {
+    lsblk -lnpo NAME ${DISK} | tail -n2 | head -n1
+}
+fetchpartition_2() {
+    lsblk -lnpo NAME ${DISK} | tail -n1
+}
+
 installcleanup() {
 echo "Cleaning up and cancelling installation..."
             # Unmount all mounted filesystems
@@ -22,7 +29,9 @@ echo "Cleaning up and cancelling installation..."
                 cryptsetup close cryptlvm 2>/dev/null
             fi
             # Wipe partition table
-            sgdisk -Z ${DISK} 2>/dev/null
+            if [[ $dualboot == "n" ]]; then
+                sgdisk -Z ${DISK} 2>/dev/null
+            fi
 
             clear
             echo "========================================="
@@ -61,20 +70,23 @@ calculatelvm() {
 
 set_partition_names() {
     # Set partition names again for UUID collection and for bios partition collection
-    if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
-        partition1=${DISK}p1
-        partition2=${DISK}p2
-        if [[ $platform == "BIOS" ]]; then
-            partition3=${DISK}p3
-        fi
+    #if [[ "${DISK}" =~ "nvme" || "${DISK}" =~ "mmcblk" ]]; then
+        #partition1=${DISK}p1
+        #partition2=${DISK}p2
+        #if [[ $platform == "BIOS" ]]; then
+        #    partition3=${DISK}p3
+        #fi
 
-    else
-        partition1=${DISK}1
-        partition2=${DISK}2
-        if [[ $platform == "BIOS" ]]; then
-            partition3=${DISK}3
-        fi
-    fi
+    #else
+    #    partition1=${DISK}1
+    #    partition2=${DISK}2
+    #    if [[ $platform == "BIOS" ]]; then
+    #        partition3=${DISK}3
+    #    fi
+    #fi
+
+    partition1=fetchpartition_1
+    partition2=fetchpartition_2
 
 }
 
@@ -83,11 +95,11 @@ setup_encryption() {
         echo "Setting up LUKS encryption..."
 
         #  which partition to encrypt based on platform
-        if [[ $platform == "BIOS" ]]; then
-            ENCRYPT_PARTITION=${partition3}
-        else
+        #if [[ $platform == "BIOS" ]]; then
+        #    ENCRYPT_PARTITION=${partition3}
+        #else
             ENCRYPT_PARTITION=${partition2}
-        fi
+            #fi
 
         while true; do
             if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${ENCRYPT_PARTITION} -; then
@@ -112,11 +124,11 @@ setup_encryption() {
     else
         echo "Setting up without encryption..."
         # Set LVM device based on platform
-        if [[ $platform == "BIOS" ]]; then
-            LVM_DEVICE="${partition3}"
-        else
+        #if [[ $platform == "BIOS" ]]; then
+        #    LVM_DEVICE="${partition3}"
+        #else
             LVM_DEVICE="${partition2}"
-        fi
+            #fi
     fi
 }
 
@@ -249,8 +261,8 @@ else
         partprobe ${DISK}
         efisetup
     elif [[ $platform == "BIOS" ]]; then
-        sgdisk -n 1::+1G --typecode=1:8300 --change-name=1:'BOOT' ${DISK} # partition1
-        sgdisk -n 2::+2M --typecode=2:ef02 --change-name=2:'BIOSBOOT' ${DISK}
+        sgdisk -n 1::+2M --typecode=2:ef02 --change-name=1:'BIOSBOOT' ${DISK}
+        sgdisk -n 2::+1G --typecode=1:8300 --change-name=2:'BOOT' ${DISK} # partition1
         sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
         sgdisk -A 1:set:2 ${DISK}
         partprobe ${DISK}
