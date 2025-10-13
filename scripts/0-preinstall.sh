@@ -2,11 +2,51 @@
 
 source scripts/vars.sh
 
+
+installcleanup() {
+echo "Cleaning up and cancelling installation..."
+            # Unmount all mounted filesystems
+            umount -R /mnt 2>/dev/null
+            # Deactivate swap
+            swapoff /dev/mapper/archvolume-swap 2>/dev/null
+            # Remove LVM volumes
+            lvremove -f archvolume/swap 2>/dev/null
+            lvremove -f archvolume/root 2>/dev/null
+            lvremove -f archvolume/home 2>/dev/null
+            # Remove volume group
+            vgremove -f archvolume 2>/dev/null
+            # Remove physical volume
+            pvremove ${LVM_DEVICE} 2>/dev/null
+            # Close encrypted device if it exists
+            if [[ $disk_encrypt == "y" ]]; then
+                cryptsetup close cryptlvm 2>/dev/null
+            fi
+            # Wipe partition table
+            sgdisk -Z ${DISK} 2>/dev/null
+
+            clear
+            echo "========================================="
+            echo "     Installation Cancelled"
+            echo "========================================="
+            echo "Disk has been cleaned up."
+            echo "You can safely rerun the script."
+            sleep 2
+            exit 0
+}
+
+
 calculatelvm() {
     # Calculating sizes for lvm
     RAM_GB=$(free -m | awk '/^Mem:/ {printf "%.0f", $2/1024}')
-    DISK_SIZE_RAW=$(lsblk -d -n -o SIZE $DISK)
-    DISK_SIZE=$(echo $DISK_SIZE_RAW | sed 's/G//' | awk '{printf "%.0f", $1}')
+
+    if [[ $dualboot == "y" ]]; then
+        DISK_SIZE=$ROOT_PARTITION_SIZE
+
+    else
+        DISK_SIZE_RAW=$(lsblk -d -n -o SIZE $DISK)
+        DISK_SIZE=$(echo $DISK_SIZE_RAW | sed 's/G//' | awk '{printf "%.0f", $1}')
+    fi
+
     if [[ $hibernate == "YES" ]]; then
         SWAP_SIZE=$((RAM_GB * 2))
     elif [[ $DISK_SIZE < 40 ]]; then
@@ -163,65 +203,74 @@ biossetup() {
 
 }
 
-# Getting rid of everything
-umount -A --recursive /mnt 2>/dev/null
-sgdisk -Z ${DISK}
-sgdisk -a 2048 -o ${DISK}
 
-# Create partitions based on platform
-if [[ $platform == "EFI" ]]; then
-    sgdisk -n 1::+3G --typecode=1:ef00 --change-name=1:'EFIBOOT' ${DISK}
-    sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
+if [[ $dualboot == "y" ]]; then
+    # Create new partitions only
+    # Creating boot partition
+    if ! sgdisk -n 0::+3G --typecode=0:ef00 --change-name=0:'EFIBOOT' ${DISK}; then
+        echo "ERROR: Failed to create EFI partition. Possibly not enough free space."
+        echo "Cancelling installation"
+        installcleanup
+        exit 1
+    fi
+
+    # Create ROOT partition
+    if ! sgdisk -n 0::-0 --typecode=0:8300 --change-name=0:'ROOT' ${DISK}; then
+        echo "ERROR: Failed to create ROOT partition. Possibly no space left."
+        echo "Cancelling installation."
+        installcleanup
+        exit 1
+    fi
+
     partprobe ${DISK}
-    efisetup
-elif [[ $platform == "BIOS" ]]; then
-    sgdisk -n 1::+1G --typecode=1:8300 --change-name=1:'BOOT' ${DISK} # partition1
-    sgdisk -n 2::+2M --typecode=2:ef02 --change-name=2:'BIOSBOOT' ${DISK}
-    sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
-    sgdisk -A 1:set:2 ${DISK}
-    partprobe ${DISK}
-    biossetup
+
+    # Finding the last partition (root partition)
+    ROOT_PARTITION=$(lsblk -lnpo NAME ${DISK} | tail -n1)
+    ROOT_PARTITION_SIZE_RAW=$(lsblk -d -n -o SIZE $ROOT_PARTITION)
+    ROOT_PARTITION_SIZE=$(echo $ROOT_PARTITION_SIZE_RAW | sed 's/G//' | awk '{printf "%.0f", $1}')
+    echo "${ROOT_PARTITION_SIZE_RAW}"
+    echo "${ROOT_PARTITION_SIZE}"
+
+    if [[ $ROOT_PARTITION_SIZE < 20 ]]; then
+        echo "ERROR: the root partition is to small"
+        installcleanup
+        exit 1
+    fi
+
 else
-    echo "ERROR: Unknown platform, exiting..."
-    exit 1
+    # Getting rid of everything
+    umount -A --recursive /mnt 2>/dev/null
+    sgdisk -Z ${DISK}
+    sgdisk -a 2048 -o ${DISK}
+    # Create partitions based on platform
+    if [[ $platform == "EFI" ]]; then
+        sgdisk -n 1::+3G --typecode=1:ef00 --change-name=1:'EFIBOOT' ${DISK}
+        sgdisk -n 2::-0 --typecode=2:8300 --change-name=2:'ROOT' ${DISK}
+        partprobe ${DISK}
+        efisetup
+    elif [[ $platform == "BIOS" ]]; then
+        sgdisk -n 1::+1G --typecode=1:8300 --change-name=1:'BOOT' ${DISK} # partition1
+        sgdisk -n 2::+2M --typecode=2:ef02 --change-name=2:'BIOSBOOT' ${DISK}
+        sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}
+        sgdisk -A 1:set:2 ${DISK}
+        partprobe ${DISK}
+        biossetup
+    else
+        echo "ERROR: Unknown platform, exiting..."
+        exit 1
+    fi
 fi
 
 # If something did not go right you need to be able to rerun the script
 # Confirmation step
+
 while true; do
     lsblk
     read -p "Continue (y/n): " answer
     if [[ $answer == "y" || $answer == "Y" ]]; then
         break
     elif [[ $answer == "n" || $answer == "N" ]]; then
-        echo "Cleaning up and cancelling installation..."
-        # Unmount all mounted filesystems
-        umount -R /mnt 2>/dev/null
-        # Deactivate swap
-        swapoff /dev/mapper/archvolume-swap 2>/dev/null
-        # Remove LVM volumes
-        lvremove -f archvolume/swap 2>/dev/null
-        lvremove -f archvolume/root 2>/dev/null
-        lvremove -f archvolume/home 2>/dev/null
-        # Remove volume group
-        vgremove -f archvolume 2>/dev/null
-        # Remove physical volume
-        pvremove ${LVM_DEVICE} 2>/dev/null
-        # Close encrypted device if it exists
-        if [[ $disk_encrypt == "y" ]]; then
-            cryptsetup close cryptlvm 2>/dev/null
-        fi
-        # Wipe partition table
-        sgdisk -Z ${DISK} 2>/dev/null
-
-        clear
-        echo "========================================="
-        echo "     Installation Cancelled"
-        echo "========================================="
-        echo "Disk has been cleaned up."
-        echo "You can safely rerun the script."
-        sleep 2
-        exit 0
+        installcleanup
     fi
 done
 

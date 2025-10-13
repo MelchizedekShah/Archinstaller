@@ -334,6 +334,21 @@ while true; do
     fi
 done
 
+ # Dual boot support setup
+if [[ $platform == "EFI" ]]; then
+    #echo "Partitions on $DISK:"
+    while true; do
+        read -p "Are you dual booting with Windows? (y/n): " dualboot
+        if [[ $dualboot == "y" || $dualboot == "Y" ]]; then
+            $dualboot="y"
+        elif [[ $dualboot == "n" || $dualboot == "N" ]]; then
+            $dualboot="n"
+        else
+            echo "Enter a valid option"
+        fi
+    done
+fi
+
 echo -ne "
 -------------------------------------------------------------------------
                           LUKS Setup
@@ -387,6 +402,7 @@ Please review your installation configuration:
 
 Firmware Type:        $platform
 Target Disk:          $DISK
+Dualboot:             $(if [[ $dualboot == "y" ]]; then echo "YES"; else echo "NO"; fi)
 Disk Encryption:      $(if [[ $disk_encrypt == "y" ]]; then echo "ENABLED (LUKS)"; else echo "DISABLED"; fi)
 Hostname:             $name_of_machine
 Timezone:             $timezone
@@ -445,6 +461,7 @@ cat > scripts/vars.sh << EOF
 
 # Disk & system information
 DISK=$DISK
+dualboot=$dualboot
 platform=$platform
 disk_encrypt=$disk_encrypt
 partition1=$partition1
