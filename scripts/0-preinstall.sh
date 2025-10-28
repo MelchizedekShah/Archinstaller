@@ -50,7 +50,7 @@ calculatelvm() {
 
     if [[ $hibernate == "YES" ]]; then
         SWAP_SIZE=$((RAM_GB * 2))
-    elif [[ $DISK_SIZE < 40 ]]; then
+    elif (( ${#DISK_SIZE} < 40 )); then
         SWAP_SIZE=2
     else
         SWAP_SIZE=4
@@ -92,6 +92,15 @@ setup_encryption() {
         #else
             ENCRYPT_PARTITION=${partition2}
             #fi
+
+
+
+           # Verify the partition exists
+                if [[ ! -b "$ENCRYPT_PARTITION" ]]; then
+                    echo "ERROR: Partition $ENCRYPT_PARTITION does not exist!"
+                    installcleanup
+                    exit 1
+                fi
 
         while true; do
             if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${ENCRYPT_PARTITION} -; then
