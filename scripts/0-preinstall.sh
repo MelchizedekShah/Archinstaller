@@ -227,19 +227,19 @@ if [[ $dualboot == "y" ]]; then
             exit 1
         fi
     elif [[ $platform == "BIOS" ]]; then
-        if ! sgdisk -n 1::+2M --typecode=0:ef02 --change-name=1:'BIOSBOOT' ${DISK}; then
+        if ! sgdisk -n 0::+2M --typecode=0:ef02 --change-name=1:'BIOSBOOT' ${DISK}; then
             echo "ERROR: Failed to create ROOT partition. Possibly no space left."
             echo "Cancelling installation."
             installcleanup
             exit 1
         fi
-        if ! sgdisk -n 2::+1G --typecode=0:8300 --change-name=2:'BOOT' ${DISK}; then # partition1
+        if ! sgdisk -n 0::+1G --typecode=0:8300 --change-name=2:'BOOT' ${DISK}; then # partition1
             echo "ERROR: Failed to create ROOT partition. Possibly no space left."
             echo "Cancelling installation."
             installcleanup
             exit 1
         fi
-        if !  sgdisk -n 3::-0 --typecode=0:8300 --change-name=3:'ROOT' ${DISK}; then
+        if !  sgdisk -n 0::-0 --typecode=0:8300 --change-name=3:'ROOT' ${DISK}; then
             echo "ERROR: Failed to create ROOT partition. Possibly no space left."
             echo "Cancelling installation."
             installcleanup
