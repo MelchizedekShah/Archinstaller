@@ -94,14 +94,6 @@ setup_encryption() {
             #fi
 
 
-
-           # Verify the partition exists
-                if [[ ! -b "$ENCRYPT_PARTITION" ]]; then
-                    echo "ERROR: Partition $ENCRYPT_PARTITION does not exist!"
-                    installcleanup
-                    exit 1
-                fi
-
         while true; do
             if echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${ENCRYPT_PARTITION} -; then
                 break
