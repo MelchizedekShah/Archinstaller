@@ -41,7 +41,7 @@ calculatelvm() {
     RAM_GB=$(free -m | awk '/^Mem:/ {printf "%.0f", $2/1024}')
 
     if [[ $dualboot == "y" ]]; then
-        DISK_SIZE=$ROOT_PARTITION_SIZE
+        DISK_SIZE=${ROOT_PARTITION_SIZE}
 
     else
         DISK_SIZE_RAW=$(lsblk -d -n -o SIZE $DISK)
@@ -211,19 +211,42 @@ biossetup() {
 if [[ $dualboot == "y" ]]; then
     # Create new partitions only
     # Creating boot partition
-    if ! sgdisk -n 0::+3G --typecode=0:ef00 --change-name=0:'EFIBOOT' ${DISK}; then
-        echo "ERROR: Failed to create EFI partition. Possibly not enough free space."
-        echo "Cancelling installation"
-        installcleanup
-        exit 1
-    fi
+    if [[ $platform == "EFI" ]]; then
+        if ! sgdisk -n 0::+3G --typecode=0:ef00 --change-name=0:'EFIBOOT' ${DISK}; then
+            echo "ERROR: Failed to create EFI partition. Possibly not enough free space."
+            echo "Cancelling installation"
+            installcleanup
+            exit 1
+        fi
 
-    # Create ROOT partition
-    if ! sgdisk -n 0::-0 --typecode=0:8300 --change-name=0:'ROOT' ${DISK}; then
-        echo "ERROR: Failed to create ROOT partition. Possibly no space left."
-        echo "Cancelling installation."
-        installcleanup
-        exit 1
+        # Create ROOT partition
+        if ! sgdisk -n 0::-0 --typecode=0:8300 --change-name=0:'ROOT' ${DISK}; then
+            echo "ERROR: Failed to create ROOT partition. Possibly no space left."
+            echo "Cancelling installation."
+            installcleanup
+            exit 1
+        fi
+    elif [[ $platform == "BIOS" ]]; then
+        if ! sgdisk -n 1::+2M --typecode=2:ef02 --change-name=1:'BIOSBOOT' ${DISK}; then
+            echo "ERROR: Failed to create ROOT partition. Possibly no space left."
+            echo "Cancelling installation."
+            installcleanup
+            exit 1
+        fi
+        if ! sgdisk -n 2::+1G --typecode=1:8300 --change-name=2:'BOOT' ${DISK}; then # partition1
+            echo "ERROR: Failed to create ROOT partition. Possibly no space left."
+            echo "Cancelling installation."
+            installcleanup
+            exit 1
+        fi
+        if !  sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK}; then
+            echo "ERROR: Failed to create ROOT partition. Possibly no space left."
+            echo "Cancelling installation."
+            installcleanup
+            exit 1
+        fi
+        sgdisk -A 1:set:2 ${DISK}
+
     fi
 
     partprobe ${DISK}
@@ -239,6 +262,12 @@ if [[ $dualboot == "y" ]]; then
         echo "ERROR: the root partition is to small"
         installcleanup
         exit 1
+    fi
+
+    if [[ $platform == "EFI" ]]; then
+        efisetup
+    elif [[ $platform == "BIOS" ]]; then
+        biossetup
     fi
 
 else

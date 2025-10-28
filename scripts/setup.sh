@@ -335,21 +335,19 @@ while true; do
 done
 
  # Dual boot support setup
-if [[ $platform == "EFI" ]]; then
     #echo "Partitions on $DISK:"
-    while true; do
-        read -p "Are you dual booting with Windows? (y/n): " dualboot
-        if [[ $dualboot == "y" || $dualboot == "Y" ]]; then
-            dualboot="y"
-            break
-        elif [[ $dualboot == "n" || $dualboot == "N" ]]; then
-            dualboot="n"
-            break
-        else
-            echo "Enter a valid option"
-        fi
-    done
-fi
+while true; do
+    read -p "Do you want to install arch along side a different OS (dualboot)? (y/n): " dualboot
+    if [[ $dualboot == "y" || $dualboot == "Y" ]]; then
+        dualboot="y"
+        break
+    elif [[ $dualboot == "n" || $dualboot == "N" ]]; then
+        dualboot="n"
+        break
+    else
+        echo "Enter a valid option"
+    fi
+done
 
 echo -ne "
 -------------------------------------------------------------------------
