@@ -50,7 +50,7 @@ calculatelvm() {
 
     if [[ $hibernate == "YES" ]]; then
         SWAP_SIZE=$((RAM_GB * 2))
-    elif (( ${#DISK_SIZE} < 40 )); then
+    elif [[ $DISK_SIZE < 40 ]]; then
         SWAP_SIZE=2
     else
         SWAP_SIZE=4
@@ -318,11 +318,11 @@ chmod +x /mnt/usr/local/share/Archinstaller/scripts/*
 
 # Store UUIDs based on setup
 if [[ $disk_encrypt == "y" ]]; then
-    if [[ $platform == "BIOS" ]]; then
-        LUKS_UUID=$(blkid -s UUID -o value "$partition3")
-    else
-        LUKS_UUID=$(blkid -s UUID -o value "$partition2")
-    fi
+    #if [[ $platform == "BIOS" ]]; then
+    LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+        #else
+        #LUKS_UUID=$(blkid -s UUID -o value "$partition2")
+        #fi
     echo "LUKS_UUID=$LUKS_UUID" >> /mnt/usr/local/share/Archinstaller/scripts/vars.sh
     echo "Stored LUKS UUID: $LUKS_UUID"
 fi
