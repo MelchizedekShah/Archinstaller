@@ -1,4 +1,5 @@
 # Archinstaller
+<<<<<<< HEAD
 
 A bash script for automated Arch Linux installation, primarily designed for virtual machine deployments.
 
@@ -30,3 +31,6 @@ This installer is specifically optimized for setting up Arch Linux in virtual ma
 ## Configuration
 
 You can customize the installation language and other settings in the configuration file before running the script.
+=======
+A script to install arch linux
+>>>>>>> refs/remotes/origin/main
