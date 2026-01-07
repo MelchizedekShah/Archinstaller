@@ -1,6 +1,6 @@
 # Archinstaller
 
-A bash script for automated Arch Linux installation, primarily designed for virtual machine deployments.
+A bash script for automated Arch Linux installation
 
 ## ⚠️ Warning
 
